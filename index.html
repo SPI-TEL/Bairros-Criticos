@@ -56,14 +56,13 @@
         .brand-icon {
             width: 42px;
             height: 42px;
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.14);
+            border: 1px solid rgba(16, 185, 129, 0.35);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            color: var(--green);
+            color: #34d399;
         }
 
         .brand-title-row {
@@ -100,7 +99,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
@@ -126,7 +125,7 @@
 
         .btn-top {
             border: none;
-            padding: 9px 15px;
+            padding: 9px 14px;
             border-radius: 7px;
             font-size: 12.5px;
             font-weight: 600;
@@ -194,6 +193,9 @@
             border-radius: 6px;
             font-weight: 600;
             font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .alert-config {
@@ -205,11 +207,14 @@
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 18px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         /* =====================================================================
-           KPI CARDS (BORDA SUPERIOR COLORIDA - PADRÃO DA IMAGEM 2)
+           KPI CARDS (BORDA SUPERIOR COLORIDA + ÍCONES SVG PROFISSIONAIS)
         ===================================================================== */
         .kpi-grid {
             display: grid;
@@ -249,7 +254,17 @@
             letter-spacing: 0.3px;
         }
 
-        .kpi-icon { font-size: 15px; opacity: 0.85; }
+        .kpi-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-blue { color: var(--blue); }
+        .icon-red { color: var(--red); }
+        .icon-amber { color: var(--amber); }
+        .icon-purple { color: var(--purple); }
+        .icon-green { color: var(--green); }
+        .icon-cyan { color: var(--cyan); }
 
         .kpi-value {
             font-size: 28px;
@@ -298,6 +313,9 @@
             margin-bottom: -2px;
             white-space: nowrap;
             transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
         }
 
         .tab-btn:hover { color: var(--blue); }
@@ -312,7 +330,7 @@
         .tab-content.active { display: block; }
 
         /* =====================================================================
-           BLOCO DE FILTROS (PADRÃO "FILTROS DE PESQUISA")
+           BLOCO DE FILTROS
         ===================================================================== */
         .filter-panel {
             background: var(--card-bg);
@@ -337,7 +355,7 @@
             text-transform: uppercase;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
 
         .btn-reset-link {
@@ -349,7 +367,7 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
         .btn-reset-link:hover { text-decoration: underline; }
 
@@ -451,7 +469,6 @@
         }
         tr:hover { background-color: #f8fafc; }
 
-        /* Células de percentual coloridas estilo heatmap da imagem 2 */
         .cell-heat-crit { background-color: #fecaca; color: #991b1b; font-weight: 700; border-radius: 4px; padding: 3px 7px; display: inline-block; }
         .cell-heat-alert { background-color: #fef08a; color: #854d0e; font-weight: 700; border-radius: 4px; padding: 3px 7px; display: inline-block; }
         .cell-heat-ok { background-color: #bbf7d0; color: #166534; font-weight: 600; border-radius: 4px; padding: 3px 7px; display: inline-block; }
@@ -509,7 +526,9 @@
 <!-- TOPBAR ESCURA PADRÃO -->
 <header class="topbar">
     <div class="brand-area">
-        <div class="brand-icon">📡</div>
+        <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>
+        </div>
         <div>
             <div class="brand-title-row">
                 <h1>GESTÃO DE BAIRROS CRÍTICOS</h1>
@@ -524,10 +543,22 @@
             <span>ÚLTIMA SINCRONIZAÇÃO</span>
             <strong id="clockSync">--:--:--</strong>
         </div>
-        <button class="btn-top btn-sync" onclick="init()">🔄 Sincronizar</button>
-        <button class="btn-top btn-dark-action" onclick="abrirModalPDF()">📄 Inserir PDF</button>
-        <a class="btn-top btn-dark-action" href="https://drive.google.com/drive/folders/1DrTg27KPrC61tWzg6d9wDcmGyDXbTtjP?usp=drive_link" target="_blank">📁 Pasta Drive</a>
-        <button class="btn-top btn-blue-action" onclick="exportarExcelAtual()">📥 Exportar Base (.xlsx)</button>
+        <button class="btn-top btn-sync" onclick="init()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+            Sincronizar
+        </button>
+        <button class="btn-top btn-dark-action" onclick="abrirModalPDF()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            Inserir PDF
+        </button>
+        <a class="btn-top btn-dark-action" href="https://drive.google.com/drive/folders/1DrTg27KPrC61tWzg6d9wDcmGyDXbTtjP?usp=drive_link" target="_blank">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Pasta Drive
+        </a>
+        <button class="btn-top btn-blue-action" onclick="exportarExcelAtual()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar Base (.xlsx)
+        </button>
     </div>
 </header>
 
@@ -539,40 +570,81 @@
             <span class="dot-red"></span>
             <span><strong>Regras de Criticidade:</strong> Crítico &lt; 96,00% | Alerta 96,01% a 97,99% | Não Crítico &ge; 98,00% (Últimos 3 meses) • Vínculo OS Prisma: <code>M.SP.(Sigla)</code></span>
         </div>
-        <div class="period-pill" id="infoMesesBase">📅 Período Analisado: Carregando...</div>
+        <div class="period-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="infoMesesBase">Período Analisado: Carregando...</span>
+        </div>
     </div>
 
-    <div id="loadingIndicator" class="alert-config">⚡ Conectando ao servidor Google Apps Script...</div>
+    <div id="loadingIndicator" class="alert-config">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Sincronizando dados com Google Sheets...</span>
+    </div>
 
-    <!-- KPI CARDS PADRONIZADOS -->
+    <!-- KPI CARDS PADRONIZADOS COM ÍCONES VETORIAIS -->
     <div class="kpi-grid">
         <div class="kpi-card top-blue">
-            <div class="kpi-header"><span>TOTAL DE SITES</span><span class="kpi-icon">📶</span></div>
+            <div class="kpi-header">
+                <span>TOTAL DE SITES</span>
+                <span class="kpi-icon icon-blue">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </span>
+            </div>
             <div class="kpi-value val-dark" id="countTotal">0</div>
             <div class="kpi-footer"><span>Base Rede Móvel</span><span>100%</span></div>
         </div>
+
         <div class="kpi-card top-red">
-            <div class="kpi-header"><span>BAIRROS CRÍTICOS</span><span class="kpi-icon">🚫</span></div>
+            <div class="kpi-header">
+                <span>BAIRROS CRÍTICOS</span>
+                <span class="kpi-icon icon-red">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                </span>
+            </div>
             <div class="kpi-value val-red" id="countCritico">0</div>
             <div class="kpi-footer"><span>Abaixo de 96,0%</span><span id="percCritico">0%</span></div>
         </div>
+
         <div class="kpi-card top-amber">
-            <div class="kpi-header"><span>EM ALERTA</span><span class="kpi-icon">⏳</span></div>
+            <div class="kpi-header">
+                <span>EM ALERTA</span>
+                <span class="kpi-icon icon-amber">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </span>
+            </div>
             <div class="kpi-value val-amber" id="countAlerta">0</div>
             <div class="kpi-footer"><span>96,01% a 97,99%</span><span id="percAlerta">0%</span></div>
         </div>
+
         <div class="kpi-card top-purple">
-            <div class="kpi-header"><span>SITES C/ TA ONLINE</span><span class="kpi-icon">🚨</span></div>
+            <div class="kpi-header">
+                <span>SITES C/ TA ONLINE</span>
+                <span class="kpi-icon icon-purple">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </span>
+            </div>
             <div class="kpi-value val-purple" id="countComTA">0</div>
             <div class="kpi-footer"><span>TAs não encerradas</span><span id="totalTAsBadge">0 TAs</span></div>
         </div>
+
         <div class="kpi-card top-green">
-            <div class="kpi-header"><span>OS PRISMA VINCULADAS</span><span class="kpi-icon">🛠️</span></div>
+            <div class="kpi-header">
+                <span>OS PRISMA VINCULADAS</span>
+                <span class="kpi-icon icon-green">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </span>
+            </div>
             <div class="kpi-value val-green" id="countOSVinculadas">0</div>
             <div class="kpi-footer"><span>Histórico Crítico/Alerta</span><span id="osAbertasResumo">0 abertas</span></div>
         </div>
+
         <div class="kpi-card top-cyan">
-            <div class="kpi-header"><span>DISPONIBILIDADE OK</span><span class="kpi-icon">📈</span></div>
+            <div class="kpi-header">
+                <span>DISPONIBILIDADE OK</span>
+                <span class="kpi-icon icon-cyan">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </span>
+            </div>
             <div class="kpi-value val-cyan" id="percNaoCritico">0%</div>
             <div class="kpi-footer"><span>Sites &ge; 98,0%</span><span id="countNaoCritico">0 sites</span></div>
         </div>
@@ -580,9 +652,18 @@
 
     <!-- ABAS DE NAVEGAÇÃO -->
     <div class="tabs-nav">
-        <button class="tab-btn active" onclick="trocarAba('abaBairros', this)">📍 ANÁLISE DE BAIRROS / SITES</button>
-        <button class="tab-btn" onclick="trocarAba('abaOS', this)">🛠️ ANÁLISE GERAL DE OS (OS PRISMA)</button>
-        <button class="tab-btn" onclick="trocarAba('abaTAs', this)">🚨 TAs ATIVAS EM BAIRROS CRÍTICOS</button>
+        <button class="tab-btn active" onclick="trocarAba('abaBairros', this)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ANÁLISE DE BAIRROS / SITES
+        </button>
+        <button class="tab-btn" onclick="trocarAba('abaOS', this)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            ANÁLISE GERAL DE OS (OS PRISMA)
+        </button>
+        <button class="tab-btn" onclick="trocarAba('abaTAs', this)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            TAs ATIVAS EM BAIRROS CRÍTICOS
+        </button>
     </div>
 
     <!-- =====================================================================
@@ -591,8 +672,14 @@
     <div id="abaBairros" class="tab-content active">
         <div class="filter-panel">
             <div class="filter-panel-header">
-                <div class="filter-panel-title">🔽 FILTROS DE PESQUISA (BAIRROS & SITES)</div>
-                <button class="btn-reset-link" onclick="limparFiltros()">↻ Limpar Filtros</button>
+                <div class="filter-panel-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    FILTROS DE PESQUISA (BAIRROS & SITES)
+                </div>
+                <button class="btn-reset-link" onclick="limparFiltros()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    Limpar Filtros
+                </button>
             </div>
             <div class="filter-grid">
                 <div class="filter-item"><label>DDD</label><select id="fDDD" onchange="filtrarBairros()"><option value="">Todos</option></select></div>
@@ -616,14 +703,17 @@
                 </div>
                 <div class="filter-item">
                     <label>BUSCA LIVRE (SITE / BAIRRO)</label>
-                    <input type="text" id="fSite" placeholder="🔍 Ex: M.SP.ABC, Bairro..." oninput="debounceFiltroBairros()">
+                    <input type="text" id="fSite" placeholder="Ex: M.SP.ABC, Bairro..." oninput="debounceFiltroBairros()">
                 </div>
             </div>
         </div>
 
         <div class="section-card">
             <div class="section-card-header">
-                <h3>📋 CONSOLIDADO DE DISPONIBILIDADE POR BAIRRO / SITE</h3>
+                <h3>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    CONSOLIDADO DE DISPONIBILIDADE POR BAIRRO / SITE
+                </h3>
                 <span class="pill-info">Critério: 3 últimos meses dinâmicos</span>
             </div>
             <div class="table-wrapper">
@@ -638,7 +728,7 @@
                     <tbody id="tabelaBairrosBody"></tbody>
                 </table>
             </div>
-            <button id="btnMaisBairros" class="btn-more" style="display:none;" onclick="mostrarMaisBairros()">⬇️ Carregar mais registros</button>
+            <button id="btnMaisBairros" class="btn-more" style="display:none;" onclick="mostrarMaisBairros()">Carregar mais registros</button>
         </div>
     </div>
 
@@ -648,8 +738,14 @@
     <div id="abaOS" class="tab-content">
         <div class="filter-panel">
             <div class="filter-panel-header">
-                <div class="filter-panel-title">🔽 FILTROS DE ORDENS DE SERVIÇO (OS PRISMA)</div>
-                <button class="btn-reset-link" onclick="limparFiltrosOS()">↻ Limpar Filtros</button>
+                <div class="filter-panel-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    FILTROS DE ORDENS DE SERVIÇO (OS PRISMA)
+                </div>
+                <button class="btn-reset-link" onclick="limparFiltrosOS()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    Limpar Filtros
+                </button>
             </div>
             <div class="filter-grid">
                 <div class="filter-item">
@@ -670,14 +766,17 @@
                 </div>
                 <div class="filter-item">
                     <label>BUSCA POR SITE / SIGLA / BAIRRO</label>
-                    <input type="text" id="fOSSite" placeholder="🔍 Ex: M.SP.ABC..." oninput="debounceFiltroOS()">
+                    <input type="text" id="fOSSite" placeholder="Ex: M.SP.ABC..." oninput="debounceFiltroOS()">
                 </div>
             </div>
         </div>
 
         <div class="section-card">
             <div class="section-card-header">
-                <h3>📊 RANKING DE REINCIDÊNCIA DE OS POR SITE CRÍTICO</h3>
+                <h3>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    RANKING DE REINCIDÊNCIA DE OS POR SITE CRÍTICO
+                </h3>
                 <span class="pill-info" id="resumoRankingBadge">0 sites afetados</span>
             </div>
             <div class="table-wrapper">
@@ -692,7 +791,10 @@
 
         <div class="section-card">
             <div class="section-card-header">
-                <h3>🛠️ HISTÓRICO DETALHADO DAS ORDENS DE SERVIÇO (OS PRISMA)</h3>
+                <h3>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    HISTÓRICO DETALHADO DAS ORDENS DE SERVIÇO (OS PRISMA)
+                </h3>
                 <span class="pill-info" id="resumoTotalOSBadge">0 registros</span>
             </div>
             <div class="table-wrapper">
@@ -701,7 +803,7 @@
                     <tbody id="tabelaOSPrismaBody"></tbody>
                 </table>
             </div>
-            <button id="btnMaisOS" class="btn-more" style="display:none;" onclick="mostrarMaisOS()">⬇️ Carregar mais OS</button>
+            <button id="btnMaisOS" class="btn-more" style="display:none;" onclick="mostrarMaisOS()">Carregar mais OS</button>
         </div>
     </div>
 
@@ -711,7 +813,10 @@
     <div id="abaTAs" class="tab-content">
         <div class="section-card">
             <div class="section-card-header">
-                <h3>🚨 VALIDAÇÃO DE TAs ONLINE ATIVAS (NÃO ENCERRADAS) EM BAIRROS CRÍTICOS</h3>
+                <h3>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    VALIDAÇÃO DE TAs ONLINE ATIVAS (NÃO ENCERRADAS) EM BAIRROS CRÍTICOS
+                </h3>
                 <span class="pill-info">Cruzamento automático em tempo real</span>
             </div>
             <div class="table-wrapper">
@@ -731,7 +836,7 @@
 <div id="modalPDF" class="modal">
     <div class="modal-content" style="max-width: 500px;">
         <span class="close-btn" onclick="fecharModais()">&times;</span>
-        <h3 style="margin-top:0;">📄 Anexar Relatório PDF no Google Drive</h3>
+        <h3 style="margin-top:0;">Anexar Relatório PDF no Google Drive</h3>
         <div style="display:flex; flex-direction:column; gap:12px; margin-top:15px;">
             <div class="filter-item">
                 <label>Vincular ao Site / Bairro (Opcional)</label>
@@ -741,7 +846,7 @@
                 <label>Selecione o arquivo PDF</label>
                 <input type="file" id="pdfFileInput" accept="application/pdf">
             </div>
-            <button class="btn-top btn-blue-action" style="justify-content:center; margin-top:6px;" onclick="enviarPDFParaDrive()">⬆️ Enviar PDF para o Drive</button>
+            <button class="btn-top btn-blue-action" style="justify-content:center; margin-top:6px;" onclick="enviarPDFParaDrive()">Enviar PDF para o Drive</button>
             <div id="statusUploadPDF" style="font-size:13px; font-weight:600; margin-top:5px;"></div>
         </div>
     </div>
@@ -751,9 +856,9 @@
 <div id="modalCarimbo" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="fecharModais()">&times;</span>
-        <h3 style="margin-top:0;">📋 Gerador de Carimbo - Bairro Crítico</h3>
+        <h3 style="margin-top:0;">Gerador de Carimbo - Bairro Crítico</h3>
         <div id="carimboContent" class="carimbo-box"></div>
-        <button class="btn-top btn-blue-action" style="margin-top:15px;" onclick="copiarCarimbo()">📋 Copiar Carimbo</button>
+        <button class="btn-top btn-blue-action" style="margin-top:15px;" onclick="copiarCarimbo()">Copiar Carimbo</button>
     </div>
 </div>
 
@@ -762,9 +867,9 @@
     <div class="modal-content">
         <span class="close-btn" onclick="fecharModais()">&times;</span>
         <h3 id="modalTitulo" style="margin-top:0;">Histórico do Site</h3>
-        <h4 style="margin-bottom:8px; color:#6d28d9;">🚨 TAs Online Ativas</h4>
+        <h4 style="margin-bottom:8px; color:#6d28d9;">TAs Online Ativas</h4>
         <table><thead><tr><th>TA</th><th>Status</th><th>Data</th><th>Causa</th></tr></thead><tbody id="histTAsBody"></tbody></table>
-        <h4 style="margin:20px 0 8px 0; color:#1e293b;">🛠️ Histórico de Ordens de Serviço (OS Prisma)</h4>
+        <h4 style="margin:20px 0 8px 0; color:#1e293b;">Histórico de Ordens de Serviço (OS Prisma)</h4>
         <div class="table-wrapper">
             <table><thead id="histOSHead"></thead><tbody id="histOSBody"></tbody></table>
         </div>
@@ -772,10 +877,8 @@
 </div>
 
 <script>
-    // =========================================================================
-    // COLE AQUI A URL DO SEU GOOGLE APPS SCRIPT (IMPLANTADO COMO APP DA WEB)
-    // =========================================================================
-    const WEB_APP_URL = "COLE_AQUI_SUA_URL_DO_GOOGLE_APPS_SCRIPT";
+    // URL DO GOOGLE APPS SCRIPT IMPLANTADO
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy9Q2KpYRYaVlyQbqq_lZ7XcwSN7bWAdtEv6Uw_2hc3x-LxtUJn6Q-u1JrpF_JF7px/exec";
 
     let dadosPortal = { meses: [], sites: [], headersOS: [], osList: [], tasAtivas: [] };
     let sitesFiltrados = [];
@@ -787,14 +890,8 @@
 
     async function init() {
         const loader = document.getElementById('loadingIndicator');
-        loader.style.display = 'block';
-
-        if (WEB_APP_URL.includes("COLE_AQUI")) {
-            loader.innerText = "⚠️ Configure a constante WEB_APP_URL no código HTML com a URL do seu Apps Script.";
-            return;
-        }
-
-        loader.innerText = "⚡ Sincronizando dados com Google Sheets...";
+        loader.style.display = 'flex';
+        loader.querySelector('span').innerText = "Sincronizando dados com Google Sheets...";
 
         try {
             const resp = await fetch(WEB_APP_URL);
@@ -811,10 +908,10 @@
             renderizarTAs();
 
             loader.style.display = 'none';
-            document.getElementById('infoMesesBase').innerText = `📅 Meses Analisados: ${dadosPortal.meses.join(" • ")}`;
+            document.getElementById('infoMesesBase').innerText = `Meses Analisados: ${dadosPortal.meses.join(" • ")}`;
             document.getElementById('clockSync').innerText = new Date().toLocaleTimeString('pt-BR');
         } catch (e) {
-            loader.innerText = "❌ Erro ao carregar dados do Apps Script. Verifique a URL e permissões da implantação.";
+            loader.querySelector('span').innerText = "Erro ao carregar dados do Apps Script. Verifique se a implantação está publicada para 'Qualquer pessoa'.";
             console.error(e);
         }
     }
@@ -935,7 +1032,7 @@
         const btnMais = document.getElementById('btnMaisBairros');
         if (sitesFiltrados.length > limiteBairros) {
             btnMais.style.display = "block";
-            btnMais.innerText = `⬇️ Carregar mais registros (exibindo ${fatia.length} de ${sitesFiltrados.length})`;
+            btnMais.innerText = `Carregar mais registros (exibindo ${fatia.length} de ${sitesFiltrados.length})`;
         } else {
             btnMais.style.display = "none";
         }
@@ -1013,7 +1110,7 @@
         const btnMais = document.getElementById('btnMaisOS');
         if (osFiltradas.length > limiteOS) {
             btnMais.style.display = "block";
-            btnMais.innerText = `⬇️ Carregar mais OS (exibindo ${fatia.length} de ${osFiltradas.length})`;
+            btnMais.innerText = `Carregar mais OS (exibindo ${fatia.length} de ${osFiltradas.length})`;
         } else {
             btnMais.style.display = "none";
         }
@@ -1093,7 +1190,7 @@ Deslocamento / Previsão: `;
         if (!fileInput.files.length) return alert("Selecione um arquivo PDF.");
         const file = fileInput.files[0];
         statusDiv.style.color = "#2563eb";
-        statusDiv.innerText = "⏳ Enviando PDF para o Google Drive...";
+        statusDiv.innerText = "Enviando PDF para o Google Drive...";
 
         const reader = new FileReader();
         reader.onload = async function() {
@@ -1106,12 +1203,12 @@ Deslocamento / Previsão: `;
                 const resJson = await resp.json();
                 if (resJson.status === "success") {
                     statusDiv.style.color = "#10b981";
-                    statusDiv.innerHTML = `✅ Salvo no Drive: <a href="${resJson.fileUrl}" target="_blank">${resJson.fileName}</a>`;
+                    statusDiv.innerHTML = `Salvo no Drive: <a href="${resJson.fileUrl}" target="_blank">${resJson.fileName}</a>`;
                     fileInput.value = "";
                 } else throw new Error(resJson.message);
             } catch (err) {
                 statusDiv.style.color = "#ef4444";
-                statusDiv.innerText = "❌ Erro: " + err.message;
+                statusDiv.innerText = "Erro: " + err.message;
             }
         };
         reader.readAsDataURL(file);
