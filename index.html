@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Gestão - Bairros Críticos & OS Prisma</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --dark: #2c3e50;
+            --danger: #d93025;
+            --warning: #f9ab00;
+            --success: #1e8e3e;
+            --bg: #f4f6f9;
+        }
+        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; margin: 0; padding: 20px; background-color: var(--bg); color: #333; }
+        .container { max-width: 1480px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        /* Cabeçalho */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .header-bar h2 { margin: 0; color: var(--dark); font-size: 22px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* Navegação por Abas */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+        .tab-btn { padding: 12px 22px; border: none; background: transparent; cursor: pointer; font-weight: bold; font-size: 14px; color: #666; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab-btn:hover { color: var(--primary); background: #f8f9fa; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #eef4fd; border-radius: 6px 6px 0 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Filtros */
+        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: #fafafa; border: 1px solid #e1e4e8; padding: 15px; border-radius: 8px; align-items: flex-end; }
+        .filter-group { flex: 1; min-width: 140px; display: flex; flex-direction: column; }
+        label { font-weight: bold; font-size: 11px; margin-bottom: 5px; color: #555; text-transform: uppercase; }
+        select, input[type="text"], input[type="file"] { padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; background: white; }
+        
+        /* Botões */
+        .btn { border: none; padding: 0 15px; border-radius: 5px; cursor: pointer; font-weight: bold; height: 36px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: 0.2s; }
+        .btn-clear { background-color: #6c757d; color: white; }
+        .btn-excel { background-color: #27ae60; color: white; }
+        .btn-pdf { background-color: #d93025; color: white; }
+        .btn-drive { background-color: #1a73e8; color: white; }
+        .btn:hover { opacity: 0.9; }
+
+        /* Cards de Resumo */
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card { padding: 16px; border-radius: 8px; text-align: center; color: white; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .card-total { background: #1a73e8; } 
+        .card-critico { background: #d93025; } 
+        .card-alerta { background: #f39c12; }
+        .card-ta { background: #8e44ad; }
+        .card-os { background: #2c3e50; }
+        .card span.valor { display: block; font-size: 28px; margin-top: 4px; }
+        .card .label-top { font-size: 12px; text-transform: uppercase; opacity: 0.95; }
+
+        /* Tabelas */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #ecf0f1; padding: 11px 10px; text-align: left; border-bottom: 2px solid #bdc3c7; font-size: 12px; text-transform: uppercase; color: #2c3e50; white-space: nowrap; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
+        tr:hover { background-color: #f9fbfd; }
+
+        /* Badges */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; color: white !important; font-weight: bold; text-transform: uppercase; display: inline-block; min-width: 82px; text-align: center; }
+        .bg-vermelho { background-color: #d93025 !important; }
+        .bg-amarelo { background-color: #f9ab00 !important; color: #222 !important; }
+        .bg-verde { background-color: #1e8e3e !important; }
+        .bg-roxo { background-color: #8e44ad !important; }
+
+        /* Ações na linha */
+        .action-btns { display: flex; gap: 5px; }
+        .btn-hist, .btn-carimbo { border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; color: white; font-weight: bold; }
+        .btn-hist { background: #34495e; }
+        .btn-carimbo { background: #e67e22; }
+
+        /* Modais */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; }
+        .modal-content { background: white; margin: 4% auto; padding: 25px; width: 75%; max-width: 900px; border-radius: 12px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .close-btn { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #999; }
+        .carimbo-box { background: #f8f9fa; border: 1px solid #ddd; padding: 18px; font-family: monospace; white-space: pre-wrap; font-size: 13px; border-radius: 6px; line-height: 1.5; }
+        
+        .loading-bar { text-align: center; padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: bold; border-radius: 6px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-bar">
+        <div>
+            <h2>📡 Portal de Gestão - Bairros Críticos & Rede Móvel</h2>
+            <small id="infoMesesBase" style="color: #666;">Carregando bases dinâmicas...</small>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-pdf" onclick="abrirModalPDF()">📄 Inserir Relatório PDF</button>
+            <a class="btn btn-drive" href="https://drive.google.com/drive/folders/1DrTg27KPrC61tWzg6d9wDcmGyDXbTtjP?usp=drive_link" target="_blank">📁 Pasta Relatórios Drive</a>
+        </div>
+    </div>
+
+    <div id="loadingIndicator" class="loading-bar">⏳ Sincronizando Disponibilidade, OS Prisma e TAs Online...</div>
+
+    <!-- Navegação entre Abas -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="trocarAba('abaBairros', this)">📍 Análise de Bairros / Sites</button>
+        <button class="tab-btn" onclick="trocarAba('abaOS', this)">🛠️ Análise Geral de Ordens de Serviço (OS Prisma)</button>
+        <button class="tab-btn" onclick="trocarAba('abaTAs', this)">🚨 TAs Ativas em Bairros Críticos</button>
+    </div>
+
+    <!-- =====================================================================
+         ABA 1: ANÁLISE DE BAIRROS / SITES
+    ====================================================================== -->
+    <div id="abaBairros" class="tab-content active">
+        <div class="filters">
+            <div class="filter-group"><label>DDD</label><select id="fDDD" onchange="filtrarBairros()"><option value="">Todos</option></select></div>
+            <div class="filter-group"><label>Cidade</label><select id="fCidade" onchange="filtrarBairros()"><option value="">Todas</option></select></div>
+            <div class="filter-group"><label>Bairro / Site</label><input type="text" id="fSite" placeholder="Ex: M.SP.ABC ou Bairro..." onkeyup="filtrarBairros()"></div>
+            <div class="filter-group">
+                <label>TA Online Ativo?</label>
+                <select id="fTA" onchange="filtrarBairros()">
+                    <option value="">Todos</option>
+                    <option value="SIM">SIM (Com TA Aberta)</option>
+                    <option value="NAO">NÃO</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Criticidade (Últ. 3 Meses)</label>
+                <select id="fCrit" onchange="filtrarBairros()">
+                    <option value="">Todas</option>
+                    <option value="CRITICO">CRÍTICO (&lt; 96,0%)</option>
+                    <option value="ALERTA">ALERTA (96,01% - 97,99%)</option>
+                    <option value="NAO CRITICO">NÃO CRÍTICO (&ge; 98,0%)</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex:0; min-width:auto; flex-direction:row; gap:8px;">
+                <button class="btn btn-clear" onclick="limparFiltros()">Limpar</button>
+                <button class="btn btn-excel" onclick="exportarExcelBairros()">📥 Excel Bairros</button>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="card card-total"><span class="label-top">Total de Sites</span><span id="countTotal" class="valor">0</span></div>
+            <div class="card card-critico"><span class="label-top">Críticos (&lt; 96%)</span><span id="countCritico" class="valor">0</span></div>
+            <div class="card card-alerta"><span class="label-top">Em Alerta (96,01 - 97,99%)</span><span id="countAlerta" class="valor">0</span></div>
+            <div class="card card-ta"><span class="label-top">Sites Críticos c/ TA Ativa</span><span id="countComTA" class="valor">0</span></div>
+            <div class="card card-os"><span class="label-top">OS Prisma Vinculadas</span><span id="countOSVinculadas" class="valor">0</span></div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr id="theadBairros">
+                        <th>DDD</th>
+                        <th>Cidade</th>
+                        <th>Bairro</th>
+                        <th>Site</th>
+                        <th>Mês -2</th>
+                        <th>Mês -1</th>
+                        <th>Mês Atual</th>
+                        <th>Status (3M)</th>
+                        <th>TA Ativo</th>
+                        <th>Qtd OS</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaBairrosBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         ABA 2: ANÁLISE GERAL DAS ORDENS DE SERVIÇO (OS PRISMA)
+    ====================================================================== -->
+    <div id="abaOS" class="tab-content">
+        <div class="filters">
+            <div class="filter-group"><label>Filtrar Site / Sigla</label><input type="text" id="fOSSite" placeholder="Ex: M.SP.ABC..." onkeyup="filtrarOS()"></div>
+            <div class="filter-group">
+                <label>Criticidade do Bairro</label>
+                <select id="fOSCrit" onchange="filtrarOS()">
+                    <option value="">Todos (Críticos e Alerta)</option>
+                    <option value="CRITICO">Somente CRÍTICOS</option>
+                    <option value="ALERTA">Somente ALERTA</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Status da OS</label>
+                <select id="fOSStatus" onchange="filtrarOS()">
+                    <option value="">Todos</option>
+                    <option value="ABERTA">Em Aberto / Execução</option>
+                    <option value="ENCERRADA">Encerrada / Concluída</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex:0; min-width:auto;">
+                <button class="btn btn-excel" onclick="exportarExcelOS()">📥 Exportar OS Prisma</button>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="card card-os"><span class="label-top">Total OS (Bairros Críticos/Alerta)</span><span id="osTotalCard" class="valor">0</span></div>
+            <div class="card card-critico"><span class="label-top">OS em Aberto</span><span id="osAbertasCard" class="valor">0</span></div>
+            <div class="card card-total"><span class="label-top">OS Encerradas</span><span id="osEncerradasCard" class="valor">0</span></div>
+            <div class="card card-alerta"><span class="label-top">Sites Críticos Afetados</span><span id="osSitesCard" class="valor">0</span></div>
+        </div>
+
+        <h3 style="margin-top:10px; color:#2c3e50;">📊 Ranking de Reincidência de OS por Site Crítico</h3>
+        <div class="table-wrapper" style="margin-bottom:25px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sigla</th>
+                        <th>Site</th>
+                        <th>Cidade</th>
+                        <th>Bairro</th>
+                        <th>Status Disponibilidade</th>
+                        <th>Total OS</th>
+                        <th>OS Abertas</th>
+                        <th>OS Encerradas</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaRankingOSBody"></tbody>
+            </table>
+        </div>
+
+        <h3 style="color:#2c3e50;">📋 Detalhamento Completo das Ordens de Serviço (OS Prisma)</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead id="theadOSPrisma"></thead>
+                <tbody id="tabelaOSPrismaBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         ABA 3: TAs ONLINE ATIVAS EM BAIRROS CRÍTICOS
+    ====================================================================== -->
+    <div id="abaTAs" class="tab-content">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>DDD</th>
+                        <th>Cidade</th>
+                        <th>Bairro</th>
+                        <th>Site</th>
+                        <th>Status Bairro</th>
+                        <th>Número TA</th>
+                        <th>Status TA</th>
+                        <th>Data / Abertura</th>
+                        <th>Causa / Alarme</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaTAsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: INSERIR RELATÓRIO PDF NO GOOGLE DRIVE -->
+<div id="modalPDF" class="modal">
+    <div class="modal-content" style="max-width: 520px;">
+        <span class="close-btn" onclick="fecharModais()">&times;</span>
+        <h3>📄 Anexar Relatório PDF no Google Drive</h3>
+        <p style="font-size: 13px; color: #555;">O arquivo será enviado diretamente para a pasta oficial de relatórios no Google Drive.</p>
+        
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:15px;">
+            <div>
+                <label>Vincular ao Site / Bairro (Opcional)</label>
+                <select id="pdfSiteSelect" style="width:100%;"><option value="">Geral / Sem site específico</option></select>
+            </div>
+            <div>
+                <label>Selecione o arquivo PDF</label>
+                <input type="file" id="pdfFileInput" accept="application/pdf" style="width:95%;">
+            </div>
+            <button id="btnEnviarPDF" class="btn btn-pdf" style="justify-content:center; margin-top:8px;" onclick="enviarPDFParaDrive()">⬆️ Enviar PDF para o Drive</button>
+            <div id="statusUploadPDF" style="font-size:13px; font-weight:bold; margin-top:5px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: GERADOR DE CARIMBO -->
+<div id="modalCarimbo" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="fecharModais()">&times;</span>
+        <h3>📋 Gerador de Carimbo - Bairro Crítico</h3>
+        <div id="carimboContent" class="carimbo-box"></div>
+        <button class="btn btn-drive" style="margin-top:15px;" onclick="copiarCarimbo()">Copiar Texto</button>
+    </div>
+</div>
+
+<!-- MODAL: HISTÓRICO DE OS E TAs DO SITE -->
+<div id="modalHistorico" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="fecharModais()">&times;</span>
+        <h3 id="modalTitulo">Histórico do Site</h3>
+        <h4>🚨 TAs Online Ativas</h4>
+        <table>
+            <thead><tr><th>TA</th><th>Status</th><th>Data</th><th>Causa / Descrição</th></tr></thead>
+            <tbody id="histTAsBody"></tbody>
+        </table>
+        <h4 style="margin-top:20px;">🛠️ Histórico de Ordens de Serviço (OS Prisma)</h4>
+        <table>
+            <thead id="histOSHead"></thead>
+            <tbody id="histOSBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // =========================================================================
+    // URLs DAS BASES CSV E DO WEB APP (GOOGLE APPS SCRIPT)
+    // =========================================================================
+    const URL_DISPONIBILIDADE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGnTfJySHX4UpxpvaEhT1X_LDtyRhOAdW_BflX3h6VrO1wWLhzAkJzUGbdKaQ4OZrk4QjBsKqJeAyd/pub?gid=1924625649&single=true&output=csv";
+    const URL_OS_PRISMA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGnTfJySHX4UpxpvaEhT1X_LDtyRhOAdW_BflX3h6VrO1wWLhzAkJzUGbdKaQ4OZrk4QjBsKqJeAyd/pub?gid=1087038308&single=true&output=csv";
+    const URL_TAS_ONLINE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqo-oRoCVNXTJE8RxAnfQcNWPty232zFuVArT6l-1w4CnsSLO7YETVeBsKPWh0SkwX8wVg-VT7Vb80/pub?output=csv";
+
+    // COLE AQUI A URL DO WEB APP GERADA NA IMPLANTAÇÃO DO APPS SCRIPT:
+    const WEB_APP_URL = "COLE_AQUI_SUA_URL_DO_GOOGLE_APPS_SCRIPT";
+
+    // Estados Globais
+    let listaSites = [];
+    let mapSitesCriticos = {};
+    let listaOSVinculadas = [];
+    let headersOSOriginais = [];
+    let listaTAsAtivas = [];
+    let nomesUltimos3Meses = [];
+    let sitesFiltradosExport = [];
+    let osFiltradasExport = [];
+
+    // Utilitários
+    function parseNum(val) {
+        if (val === undefined || val === null || val === "" || val === "-") return null;
+        const n = parseFloat(val.toString().replace('%', '').replace(',', '.').trim());
+        return isNaN(n) ? null : n;
+    }
+
+    function extrairSigla3(texto) {
+        if (!texto) return "";
+        const str = texto.toString().trim().toUpperCase();
+        const msp = str.match(/M\.SP\.([A-Z0-9]{3})/);
+        if (msp) return msp[1];
+        const partes = str.split(".");
+        return partes[partes.length - 1].trim().slice(0, 3);
+    }
+
+    function carregarCSV(url) {
+        return new Promise((resolve, reject) => {
+            Papa.parse(url, {
+                download: true,
+                skipEmptyLines: true,
+                complete: res => resolve(res.data),
+                error: err => reject(err)
+            });
+        });
+    }
+
+    // Inicialização
+    async function init() {
+        try {
+            const [rawDisp, rawOS, rawTAs] = await Promise.all([
+                carregarCSV(URL_DISPONIBILIDADE),
+                carregarCSV(URL_OS_PRISMA),
+                carregarCSV(URL_TAS_ONLINE)
+            ]);
+
+            processarDisponibilidade(rawDisp);
+            processarTAs(rawTAs);
+            processarOS(rawOS);
+
+            popularFiltros();
+            filtrarBairros();
+            filtrarOS();
+            renderizarTabelaTAs();
+
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('infoMesesBase').innerText = `Período analisado (3 últimos meses): ${nomesUltimos3Meses.join(" | ")}`;
+        } catch (e) {
+            document.getElementById('loadingIndicator').innerText = "❌ Erro ao carregar planilhas públicas. Verifique a conexão.";
+            console.error(e);
+        }
+    }
+
+    // 1. Processa Disponibilidade (Detecta dinamicamente os 3 últimos meses)
+    function processarDisponibilidade(rows) {
+        let hIdx = rows.findIndex(r => r.some(c => c.toString().trim().toUpperCase() === "SITE"));
+        if (hIdx < 0) hIdx = 0;
+
+        const headers = rows[hIdx].map(h => h.toString().trim().toUpperCase());
+        const idxDDD = headers.findIndex(h => h === "DDD" || h === "CN");
+        const idxCid = headers.findIndex(h => h.includes("MUNIC") || h.includes("CIDADE"));
+        const idxBairro = headers.findIndex(h => h.includes("BAIRRO"));
+        const idxSite = headers.findIndex(h => h === "SITE");
+
+        const regexMes = /(JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)/i;
+        const colsMeses = [];
+        headers.forEach((h, idx) => {
+            if (regexMes.test(h) && !/^\d{1,2}\/\d{1,2}/.test(h)) {
+                colsMeses.push({ nome: h, idx });
+            }
+        });
+
+        const ultimos3 = colsMeses.slice(-3);
+        nomesUltimos3Meses = ultimos3.map(m => m.nome);
+
+        // Atualiza cabeçalho da tabela com os nomes reais dos meses
+        const ths = document.querySelectorAll("#theadBairros th");
+        if (ultimos3[0]) ths[4].innerText = ultimos3[0].nome;
+        if (ultimos3[1]) ths[5].innerText = ultimos3[1].nome;
+        if (ultimos3[2]) ths[6].innerText = ultimos3[2].nome;
+
+        for (let i = hIdx + 1; i < rows.length; i++) {
+            const r = rows[i];
+            const site = (r[idxSite] || "").toString().trim().toUpperCase();
+            if (!site) continue;
+
+            const sigla3 = extrairSigla3(site);
+            let isCritico = false;
+            let isAlerta = false;
+            const vals = [];
+
+            ultimos3.forEach(m => {
+                const v = parseNum(r[m.idx]);
+                vals.push(v);
+                if (v !== null && v > 0) {
+                    if (v < 96.0) isCritico = true;
+                    else if (v >= 96.01 && v <= 97.99) isAlerta = true;
+                }
+            });
+
+            let status = "NAO CRITICO";
+            if (isCritico) status = "CRITICO";
+            else if (isAlerta) status = "ALERTA";
+
+            const obj = {
+                ddd: idxDDD >= 0 ? r[idxDDD] : "-",
+                cidade: idxCid >= 0 ? r[idxCid] : "-",
+                bairro: idxBairro >= 0 ? r[idxBairro] : "-",
+                site,
+                sigla3,
+                vals,
+                status,
+                tas: [],
+                osList: []
+            };
+
+            listaSites.push(obj);
+            if (status === "CRITICO" || status === "ALERTA") {
+                mapSitesCriticos[sigla3] = obj;
+                mapSitesCriticos[site] = obj;
+            }
+        }
+    }
+
+    // 2. Valida TAs Online não encerradas
+    function processarTAs(rows) {
+        if (rows.length < 2) return;
+        const headers = rows[0].map(h => h.toString().trim().toUpperCase());
+        const idxTA = headers.findIndex(h => h === "TA" || h.includes("NUMERO") || h.includes("TICKET"));
+        const idxSite = headers.findIndex(h => h.includes("SITE") || h.includes("ESTACAO") || h.includes("ESTAÇÃO"));
+        const idxStatus = headers.findIndex(h => h.includes("STATUS") || h.includes("SITUACAO") || h.includes("SITUAÇÃO") || h.includes("ESTADO"));
+        const idxCausa = headers.findIndex(h => h.includes("CAUSA") || h.includes("ALARME") || h.includes("DESC") || h.includes("PROBLEMA"));
+        const idxData = headers.findIndex(h => h.includes("DATA") || h.includes("ABERTURA") || h.includes("INICIO"));
+
+        for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            const st = (idxStatus >= 0 ? r[idxStatus] : "").toString().trim().toUpperCase();
+            if (st.includes("ENCERRAD") || st.includes("FECHAD") || st.includes("CANCELAD") || st.includes("CONCLUID")) continue;
+
+            const siteCol = (idxSite >= 0 ? r[idxSite] : "").toString().trim().toUpperCase();
+            const sigla3 = extrairSigla3(siteCol);
+            const siteObj = mapSitesCriticos[sigla3];
+
+            if (siteObj) {
+                const taInfo = {
+                    ddd: siteObj.ddd,
+                    cidade: siteObj.cidade,
+                    bairro: siteObj.bairro,
+                    site: siteObj.site,
+                    statusSite: siteObj.status,
+                    ta: idxTA >= 0 ? r[idxTA] : "S/N",
+                    statusTA: st || "ATIVA",
+                    data: idxData >= 0 ? r[idxData] : "-",
+                    causa: idxCausa >= 0 ? r[idxCausa] : "-"
+                };
+                siteObj.tas.push(taInfo);
+                listaTAsAtivas.push(taInfo);
+            }
+        }
+    }
+
+    // 3. Copia e vincula OS Prisma aos Bairros Críticos
+    function processarOS(rows) {
+        if (rows.length < 2) return;
+        headersOSOriginais = rows[0].map(h => h.toString().trim());
+        const hUpper = headersOSOriginais.map(h => h.toUpperCase());
+        const idxSite = hUpper.findIndex(h => h.includes("SITE") || h.includes("ESTACAO") || h.includes("LOCAL"));
+        const idxStatus = hUpper.findIndex(h => h.includes("STATUS") || h.includes("SITUACAO") || h.includes("ESTADO"));
+
+        for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            const siteCol = (idxSite >= 0 ? r[idxSite] : "").toString().trim().toUpperCase();
+            const sigla3 = extrairSigla3(siteCol);
+            const siteObj = mapSitesCriticos[sigla3];
+
+            if (siteObj) {
+                const stRaw = (idxStatus >= 0 ? r[idxStatus] : "").toString().toUpperCase();
+                const encerrada = stRaw.includes("ENCERRAD") || stRaw.includes("CONCLU") || stRaw.includes("FECHAD");
+
+                const osRegistro = {
+                    raw: r,
+                    sigla3,
+                    site: siteObj.site,
+                    cidade: siteObj.cidade,
+                    bairro: siteObj.bairro,
+                    statusSite: siteObj.status,
+                    encerrada
+                };
+                siteObj.osList.push(osRegistro);
+                listaOSVinculadas.push(osRegistro);
+            }
+        }
+    }
+
+    // Filtros e Renderização Aba 1 (Bairros)
+    function popularFiltros() {
+        const ddds = [...new Set(listaSites.map(s => s.ddd))].filter(Boolean).sort();
+        const cidades = [...new Set(listaSites.map(s => s.cidade))].filter(Boolean).sort();
+        ddds.forEach(d => document.getElementById('fDDD').add(new Option(d, d)));
+        cidades.forEach(c => document.getElementById('fCidade').add(new Option(c, c)));
+
+        // Popula select do Modal PDF com sites críticos/alerta
+        const pdfSel = document.getElementById('pdfSiteSelect');
+        listaSites.filter(s => s.status !== "NAO CRITICO").forEach(s => {
+            pdfSel.add(new Option(`${s.site} - ${s.bairro} (${s.cidade})`, s.site));
+        });
+    }
+
+    function filtrarBairros() {
+        const ddd = document.getElementById('fDDD').value;
+        const cid = document.getElementById('fCidade').value;
+        const busca = document.getElementById('fSite').value.toUpperCase();
+        const taF = document.getElementById('fTA').value;
+        const critF = document.getElementById('fCrit').value;
+
+        sitesFiltradosExport = listaSites.filter(s => {
+            const matchDDD = !ddd || s.ddd === ddd;
+            const matchCid = !cid || s.cidade === cid;
+            const matchBusca = !busca || s.site.includes(busca) || s.bairro.toUpperCase().includes(busca) || s.sigla3.includes(busca);
+            const matchTA = taF === "SIM" ? s.tas.length > 0 : (taF === "NAO" ? s.tas.length === 0 : true);
+            const matchCrit = !critF || s.status === critF;
+            return matchDDD && matchCid && matchBusca && matchTA && matchCrit;
+        });
+
+        const tbody = document.getElementById('tabelaBairrosBody');
+        tbody.innerHTML = "";
+        let cCrit = 0, cAlert = 0, cTA = 0, cOS = 0;
+
+        sitesFiltradosExport.forEach(s => {
+            if (s.status === "CRITICO") cCrit++;
+            if (s.status === "ALERTA") cAlert++;
+            if (s.tas.length > 0) cTA++;
+            cOS += s.osList.length;
+
+            const badgeClass = s.status === "CRITICO" ? "bg-vermelho" : (s.status === "ALERTA" ? "bg-amarelo" : "bg-verde");
+            const fmtVal = v => v !== null ? v.toFixed(2).replace('.', ',') + "%" : "-";
+            const taTexto = s.tas.length > 0 ? `<span class="status-badge bg-roxo">${s.tas.map(t => t.ta).join(", ")}</span>` : "-";
+
+            tbody.innerHTML += `<tr>
+                <td>${s.ddd}</td>
+                <td>${s.cidade}</td>
+                <td>${s.bairro}</td>
+                <td><strong>${s.site}</strong></td>
+                <td>${fmtVal(s.vals[0])}</td>
+                <td>${fmtVal(s.vals[1])}</td>
+                <td><strong>${fmtVal(s.vals[2])}</strong></td>
+                <td><span class="status-badge ${badgeClass}">${s.status}</span></td>
+                <td>${taTexto}</td>
+                <td><strong>${s.osList.length}</strong></td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-hist" onclick="abrirHistorico('${s.sigla3}')">Histórico</button>
+                        <button class="btn-carimbo" onclick="gerarCarimbo('${s.sigla3}')">Carimbo</button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+
+        document.getElementById('countTotal').innerText = sitesFiltradosExport.length;
+        document.getElementById('countCritico').innerText = cCrit;
+        document.getElementById('countAlerta').innerText = cAlert;
+        document.getElementById('countComTA').innerText = cTA;
+        document.getElementById('countOSVinculadas').innerText = cOS;
+    }
+
+    // Filtros e Renderização Aba 2 (Análise Geral OS Prisma)
+    function filtrarOS() {
+        const busca = document.getElementById('fOSSite').value.toUpperCase();
+        const crit = document.getElementById('fOSCrit').value;
+        const st = document.getElementById('fOSStatus').value;
+
+        osFiltradasExport = listaOSVinculadas.filter(o => {
+            const mBusca = !busca || o.site.includes(busca) || o.sigla3.includes(busca) || o.bairro.toUpperCase().includes(busca);
+            const mCrit = !crit || o.statusSite === crit;
+            const mSt = st === "ABERTA" ? !o.encerrada : (st === "ENCERRADA" ? o.encerrada : true);
+            return mBusca && mCrit && mSt;
+        });
+
+        // Cards OS
+        const abertas = osFiltradasExport.filter(o => !o.encerrada).length;
+        const encerradas = osFiltradasExport.filter(o => o.encerrada).length;
+        const sitesUnicos = new Set(osFiltradasExport.map(o => o.sigla3)).size;
+
+        document.getElementById('osTotalCard').innerText = osFiltradasExport.length;
+        document.getElementById('osAbertasCard').innerText = abertas;
+        document.getElementById('osEncerradasCard').innerText = encerradas;
+        document.getElementById('osSitesCard').innerText = sitesUnicos;
+
+        // Ranking por site
+        const rankMap = {};
+        osFiltradasExport.forEach(o => {
+            if (!rankMap[o.sigla3]) {
+                rankMap[o.sigla3] = { sigla: o.sigla3, site: o.site, cidade: o.cidade, bairro: o.bairro, status: o.statusSite, total: 0, ab: 0, enc: 0 };
+            }
+            rankMap[o.sigla3].total++;
+            o.encerrada ? rankMap[o.sigla3].enc++ : rankMap[o.sigla3].ab++;
+        });
+
+        const rankBody = document.getElementById('tabelaRankingOSBody');
+        rankBody.innerHTML = "";
+        Object.values(rankMap).sort((a, b) => b.total - a.total).forEach(r => {
+            const bClass = r.status === "CRITICO" ? "bg-vermelho" : "bg-amarelo";
+            rankBody.innerHTML += `<tr>
+                <td><strong>${r.sigla}</strong></td>
+                <td>${r.site}</td>
+                <td>${r.cidade}</td>
+                <td>${r.bairro}</td>
+                <td><span class="status-badge ${bClass}">${r.status}</span></td>
+                <td><strong>${r.total}</strong></td>
+                <td style="color:#d93025; font-weight:bold;">${r.ab}</td>
+                <td style="color:#1e8e3e;">${r.enc}</td>
+            </tr>`;
+        });
+
+        // Tabela Detalhada OS Prisma
+        const thead = document.getElementById('theadOSPrisma');
+        const tbody = document.getElementById('tabelaOSPrismaBody');
+        thead.innerHTML = `<tr><th>Bairro Crítico</th><th>Status Site</th>${headersOSOriginais.map(h => `<th>${h}</th>`).join("")}</tr>`;
+        tbody.innerHTML = "";
+
+        osFiltradasExport.forEach(o => {
+            const bClass = o.statusSite === "CRITICO" ? "bg-vermelho" : "bg-amarelo";
+            tbody.innerHTML += `<tr>
+                <td><strong>${o.bairro} (${o.sigla3})</strong></td>
+                <td><span class="status-badge ${bClass}">${o.statusSite}</span></td>
+                ${o.raw.map(c => `<td>${c || "-"}</td>`).join("")}
+            </tr>`;
+        });
+    }
+
+    // Aba 3: TAs Online
+    function renderizarTabelaTAs() {
+        const tbody = document.getElementById('tabelaTAsBody');
+        tbody.innerHTML = listaTAsAtivas.length ? "" : `<tr><td colspan="9">Nenhuma TA ativa encontrada para os bairros críticos/alerta.</td></tr>`;
+        listaTAsAtivas.forEach(t => {
+            const bClass = t.statusSite === "CRITICO" ? "bg-vermelho" : "bg-amarelo";
+            tbody.innerHTML += `<tr>
+                <td>${t.ddd}</td>
+                <td>${t.cidade}</td>
+                <td>${t.bairro}</td>
+                <td><strong>${t.site}</strong></td>
+                <td><span class="status-badge ${bClass}">${t.statusSite}</span></td>
+                <td><strong>${t.ta}</strong></td>
+                <td><span class="status-badge bg-roxo">${t.statusTA}</span></td>
+                <td>${t.data}</td>
+                <td>${t.causa}</td>
+            </tr>`;
+        });
+    }
+
+    // Modais (Histórico, Carimbo e Upload PDF)
+    function abrirHistorico(sigla3) {
+        const s = mapSitesCriticos[sigla3] || listaSites.find(x => x.sigla3 === sigla3);
+        if (!s) return;
+
+        document.getElementById('modalTitulo').innerText = `Histórico Completo: ${s.site} (${s.bairro} - ${s.cidade})`;
+        
+        const tasBody = document.getElementById('histTAsBody');
+        tasBody.innerHTML = s.tas.length ? s.tas.map(t => `<tr><td>${t.ta}</td><td>${t.statusTA}</td><td>${t.data}</td><td>${t.causa}</td></tr>`).join("") : `<tr><td colspan="4">Sem TAs ativas no momento.</td></tr>`;
+
+        const osHead = document.getElementById('histOSHead');
+        const osBody = document.getElementById('histOSBody');
+        osHead.innerHTML = `<tr>${headersOSOriginais.map(h => `<th>${h}</th>`).join("")}</tr>`;
+        osBody.innerHTML = s.osList.length ? s.osList.map(o => `<tr>${o.raw.map(c => `<td>${c || "-"}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${headersOSOriginais.length}">Sem Ordens de Serviço registradas na OS Prisma.</td></tr>`;
+
+        document.getElementById('modalHistorico').style.display = "block";
+    }
+
+    function gerarCarimbo(sigla3) {
+        const s = mapSitesCriticos[sigla3] || listaSites.find(x => x.sigla3 === sigla3);
+        if (!s) return;
+
+        const tasTxt = s.tas.length ? s.tas.map(t => `- TA: ${t.ta} | ${t.statusTA} | ${t.causa}`).join("\n") : "- Nenhuma TA aberta no momento";
+        const ultimasOS = s.osList.slice(-3).map(o => `- OS: ${o.raw.slice(0, 4).join(" | ")}`).join("\n") || "- Sem histórico recente de OS";
+
+        document.getElementById('carimboContent').innerText = 
+`*** BAIRRO CRÍTICO - REDE MÓVEL ***
+Site: ${s.site} (Sigla: ${s.sigla3})
+Bairro / Cidade: ${s.bairro} - ${s.cidade} (DDD ${s.ddd})
+Status Disponibilidade (3M): ${s.status} (${nomesUltimos3Meses.map((m, i) => `${m}: ${s.vals[i] ?? '-'}%`).join(" | ")})
+
+[TAs ONLINE ATIVAS]
+${tasTxt}
+
+[ÚLTIMAS OS PRISMA]
+${ultimasOS}
+
+Técnico: 
+Deslocamento / Previsão: `;
+        document.getElementById('modalCarimbo').style.display = "block";
+    }
+
+    function abrirModalPDF() {
+        document.getElementById('statusUploadPDF').innerText = "";
+        document.getElementById('modalPDF').style.display = "block";
+    }
+
+    async function enviarPDFParaDrive() {
+        const fileInput = document.getElementById('pdfFileInput');
+        const statusDiv = document.getElementById('statusUploadPDF');
+        const prefixo = document.getElementById('pdfSiteSelect').value;
+
+        if (!fileInput.files.length) {
+            alert("Selecione um arquivo PDF primeiro.");
+            return;
+        }
+        if (WEB_APP_URL.includes("COLE_AQUI")) {
+            alert("Configure a variável WEB_APP_URL no código HTML com a URL do seu Google Apps Script implantado.");
+            return;
+        }
+
+        const file = fileInput.files[0];
+        statusDiv.style.color = "#1a73e8";
+        statusDiv.innerText = "⏳ Enviando PDF para o Google Drive...";
+
+        const reader = new FileReader();
+        reader.onload = async function() {
+            const base64Data = reader.result.split(',')[1];
+            try {
+                const resp = await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "uploadPDF",
+                        fileName: file.name,
+                        prefixo: prefixo,
+                        base64Data: base64Data
+                    })
+                });
+                const resJson = await resp.json();
+                if (resJson.status === "success") {
+                    statusDiv.style.color = "#1e8e3e";
+                    statusDiv.innerHTML = `✅ Arquivo salvo no Drive: <a href="${resJson.fileUrl}" target="_blank">${resJson.fileName}</a>`;
+                    fileInput.value = "";
+                } else {
+                    throw new Error(resJson.message);
+                }
+            } catch (err) {
+                statusDiv.style.color = "#d93025";
+                statusDiv.innerText = "❌ Falha no envio: " + err.message;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Exportações Excel
+    function exportarExcelBairros() {
+        const rows = sitesFiltradosExport.map(s => ({
+            "DDD": s.ddd,
+            "Cidade": s.cidade,
+            "Bairro": s.bairro,
+            "Site": s.site,
+            "Sigla": s.sigla3,
+            [nomesUltimos3Meses[0] || "Mês -2"]: s.vals[0] ?? "-",
+            [nomesUltimos3Meses[1] || "Mês -1"]: s.vals[1] ?? "-",
+            [nomesUltimos3Meses[2] || "Mês Atual"]: s.vals[2] ?? "-",
+            "Status": s.status,
+            "TAs Ativas": s.tas.map(t => t.ta).join(", ") || "NÃO",
+            "Total OS Prisma": s.osList.length
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Analise_Bairros");
+        XLSX.writeFile(wb, "Analise_Bairros_Criticos.xlsx");
+    }
+
+    function exportarExcelOS() {
+        const rows = osFiltradasExport.map(o => {
+            let obj = { "Bairro Crítico": o.bairro, "Sigla": o.sigla3, "Status Site": o.statusSite };
+            headersOSOriginais.forEach((h, i) => obj[h] = o.raw[i]);
+            return obj;
+        });
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "OS_Prisma_Criticos");
+        XLSX.writeFile(wb, "Analise_Geral_OS_Prisma.xlsx");
+    }
+
+    // Navegação e Helpers UI
+    function trocarAba(abaId, btn) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(abaId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function copiarCarimbo() {
+        navigator.clipboard.writeText(document.getElementById('carimboContent').innerText);
+        alert("Carimbo copiado!");
+    }
+
+    function fecharModais() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = "none");
+    }
+
+    function limparFiltros() {
+        document.querySelectorAll('#abaBairros select, #abaBairros input').forEach(el => el.value = "");
+        filtrarBairros();
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
