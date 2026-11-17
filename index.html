@@ -3,230 +3,746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Gestão - Bairros Críticos & OS Prisma</title>
+    <title>Gestão de Bairros Críticos & OS Prisma - Contrato Vivo / TEL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --primary: #1a73e8;
-            --dark: #2c3e50;
-            --danger: #d93025;
-            --warning: #f9ab00;
-            --success: #1e8e3e;
-            --bg: #f4f6f9;
+            --header-bg: #0b132b;
+            --bg-page: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            
+            --blue: #2563eb;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --purple: #8b5cf6;
+            --red: #ef4444;
+            --cyan: #06b6d4;
         }
-        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; margin: 0; padding: 15px; background-color: var(--bg); color: #333; }
-        .container { max-width: 1480px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        
-        .header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 18px; }
-        .header-bar h2 { margin: 0; color: var(--dark); font-size: 21px; }
-        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        .tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 2px solid #e0e0e0; overflow-x: auto; }
-        .tab-btn { padding: 11px 18px; border: none; background: transparent; cursor: pointer; font-weight: bold; font-size: 13px; color: #666; border-bottom: 3px solid transparent; white-space: nowrap; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #eef4fd; border-radius: 6px 6px 0 0; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+        }
+
+        /* =====================================================================
+           TOP BAR (PADRÃO CONTROLE DE PREVENTIVAS)
+        ===================================================================== */
+        .topbar {
+            background-color: var(--header-bg);
+            color: #ffffff;
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--green);
+        }
+
+        .brand-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .brand-title-row h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .live-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sync-info {
+            text-align: right;
+            margin-right: 6px;
+        }
+
+        .sync-info span {
+            display: block;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sync-info strong {
+            font-size: 14px;
+            font-family: monospace;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .btn-top {
+            border: none;
+            padding: 9px 15px;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            transition: all 0.2s;
+            color: #ffffff;
+        }
+
+        .btn-sync { background-color: var(--green); }
+        .btn-sync:hover { background-color: #059669; }
+        .btn-dark-action { background-color: #1e293b; border: 1px solid #334155; }
+        .btn-dark-action:hover { background-color: #334155; }
+        .btn-blue-action { background-color: var(--blue); }
+        .btn-blue-action:hover { background-color: #1d4ed8; }
+
+        /* =====================================================================
+           MAIN CONTAINER & BANNER DE REGRAS
+        ===================================================================== */
+        .main-wrapper {
+            max-width: 1560px;
+            margin: 20px auto;
+            padding: 0 24px 40px 24px;
+        }
+
+        .rules-banner {
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            border-left: 5px solid var(--red);
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            font-size: 12.5px;
+        }
+
+        .rules-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #334155;
+        }
+
+        .dot-red {
+            width: 9px;
+            height: 9px;
+            background-color: var(--red);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .period-pill {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            color: #854d0e;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .alert-config {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        /* =====================================================================
+           KPI CARDS (BORDA SUPERIOR COLORIDA - PADRÃO DA IMAGEM 2)
+        ===================================================================== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-light);
+            border-top: 4px solid var(--blue);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 118px;
+        }
+
+        .kpi-card.top-blue { border-top-color: var(--blue); }
+        .kpi-card.top-red { border-top-color: var(--red); }
+        .kpi-card.top-amber { border-top-color: var(--amber); }
+        .kpi-card.top-purple { border-top-color: var(--purple); }
+        .kpi-card.top-green { border-top-color: var(--green); }
+        .kpi-card.top-cyan { border-top-color: var(--cyan); }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-icon { font-size: 15px; opacity: 0.85; }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 8px 0 4px 0;
+            line-height: 1.1;
+        }
+
+        .val-dark { color: var(--text-main); }
+        .val-red { color: var(--red); }
+        .val-amber { color: var(--amber); }
+        .val-purple { color: var(--purple); }
+        .val-green { color: var(--green); }
+        .val-cyan { color: #0891b2; }
+
+        .kpi-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* =====================================================================
+           ABAS DE NAVEGAÇÃO
+        ===================================================================== */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 11px 18px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .tab-btn:hover { color: var(--blue); }
+        .tab-btn.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+            background: rgba(37, 99, 235, 0.06);
+            border-radius: 8px 8px 0 0;
+        }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; background: #fafafa; border: 1px solid #e1e4e8; padding: 12px; border-radius: 8px; align-items: flex-end; }
-        .filter-group { flex: 1; min-width: 130px; display: flex; flex-direction: column; }
-        label { font-weight: bold; font-size: 11px; margin-bottom: 4px; color: #555; text-transform: uppercase; }
-        select, input[type="text"], input[type="file"] { padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; background: white; }
-        
-        .btn { border: none; padding: 0 14px; border-radius: 5px; cursor: pointer; font-weight: bold; height: 34px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-        .btn-clear { background-color: #6c757d; color: white; }
-        .btn-excel { background-color: #27ae60; color: white; }
-        .btn-pdf { background-color: #d93025; color: white; }
-        .btn-drive { background-color: #1a73e8; color: white; }
-        .btn-more { background-color: #eef4fd; color: #1a73e8; border: 1px solid #1a73e8; width: 100%; justify-content: center; margin-top: 12px; height: 38px; }
-        .btn:hover { opacity: 0.9; }
+        /* =====================================================================
+           BLOCO DE FILTROS (PADRÃO "FILTROS DE PESQUISA")
+        ===================================================================== */
+        .filter-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
 
-        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .card { padding: 14px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
-        .card-total { background: #1a73e8; } 
-        .card-critico { background: #d93025; } 
-        .card-alerta { background: #f39c12; }
-        .card-ta { background: #8e44ad; }
-        .card-os { background: #2c3e50; }
-        .card span.valor { display: block; font-size: 26px; margin-top: 4px; }
-        .card .label-top { font-size: 11px; text-transform: uppercase; opacity: 0.95; }
+        .filter-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .filter-panel-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #1e293b;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-reset-link {
+            background: none;
+            border: none;
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-reset-link:hover { text-decoration: underline; }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-item label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .filter-item select, .filter-item input {
+            padding: 8px 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-main);
+            background-color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-item select:focus, .filter-item input:focus {
+            border-color: var(--blue);
+        }
+
+        /* =====================================================================
+           CARDS DE TABELA E BADGES
+        ===================================================================== */
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            padding: 18px 20px;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            margin-bottom: 20px;
+        }
+
+        .section-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-card-header h3 {
+            margin: 0;
+            font-size: 13.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pill-info {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
         .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        th { background: #ecf0f1; padding: 10px 8px; text-align: left; border-bottom: 2px solid #bdc3c7; font-size: 11px; text-transform: uppercase; color: #2c3e50; white-space: nowrap; }
-        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 12.5px; }
-        tr:hover { background-color: #f9fbfd; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 11px 10px;
+            text-align: left;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12.5px;
+            color: #1e293b;
+        }
+        tr:hover { background-color: #f8fafc; }
 
-        .status-badge { padding: 3px 9px; border-radius: 20px; font-size: 10px; color: white !important; font-weight: bold; text-transform: uppercase; display: inline-block; min-width: 78px; text-align: center; }
-        .bg-vermelho { background-color: #d93025 !important; }
-        .bg-amarelo { background-color: #f9ab00 !important; color: #222 !important; }
-        .bg-verde { background-color: #1e8e3e !important; }
-        .bg-roxo { background-color: #8e44ad !important; }
+        /* Células de percentual coloridas estilo heatmap da imagem 2 */
+        .cell-heat-crit { background-color: #fecaca; color: #991b1b; font-weight: 700; border-radius: 4px; padding: 3px 7px; display: inline-block; }
+        .cell-heat-alert { background-color: #fef08a; color: #854d0e; font-weight: 700; border-radius: 4px; padding: 3px 7px; display: inline-block; }
+        .cell-heat-ok { background-color: #bbf7d0; color: #166534; font-weight: 600; border-radius: 4px; padding: 3px 7px; display: inline-block; }
 
-        .action-btns { display: flex; gap: 4px; }
-        .btn-hist, .btn-carimbo { border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; color: white; font-weight: bold; }
-        .btn-hist { background: #34495e; }
-        .btn-carimbo { background: #e67e22; }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            min-width: 82px;
+            text-align: center;
+        }
+        .bg-vermelho { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .bg-amarelo { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+        .bg-verde { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .bg-roxo { background: #f3e8ff; color: #6d28d9; border: 1px solid #d8b4fe; }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto; }
-        .modal-content { background: white; margin: 4% auto; padding: 22px; width: 80%; max-width: 900px; border-radius: 12px; position: relative; }
-        .close-btn { position: absolute; right: 20px; top: 15px; font-size: 26px; cursor: pointer; color: #999; }
-        .carimbo-box { background: #f8f9fa; border: 1px solid #ddd; padding: 16px; font-family: monospace; white-space: pre-wrap; font-size: 13px; border-radius: 6px; }
-        .loading-bar { text-align: center; padding: 10px; background: #e8f0fe; color: #1a73e8; font-weight: bold; border-radius: 6px; margin-bottom: 15px; font-size: 13px; }
+        .action-btns { display: flex; gap: 5px; }
+        .btn-row {
+            border: none;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+        }
+        .btn-hist { background: #334155; }
+        .btn-carimbo { background: #d97706; }
+
+        .btn-more {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
+            background: #eff6ff;
+            color: var(--blue);
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12.5px;
+            cursor: pointer;
+        }
+
+        /* Modais */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); overflow-y: auto; }
+        .modal-content { background: white; margin: 4% auto; padding: 24px; width: 85%; max-width: 900px; border-radius: 12px; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        .close-btn { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #64748b; }
+        .carimbo-box { background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; font-family: monospace; white-space: pre-wrap; font-size: 12.5px; border-radius: 8px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-bar">
+<!-- TOPBAR ESCURA PADRÃO -->
+<header class="topbar">
+    <div class="brand-area">
+        <div class="brand-icon">📡</div>
         <div>
-            <h2>📡 Portal de Gestão - Bairros Críticos & Rede Móvel</h2>
-            <small id="infoMesesBase" style="color: #666;">Conectando ao servidor...</small>
-        </div>
-        <div class="header-actions">
-            <button class="btn btn-pdf" onclick="abrirModalPDF()">📄 Inserir Relatório PDF</button>
-            <a class="btn btn-drive" href="https://drive.google.com/drive/folders/1DrTg27KPrC61tWzg6d9wDcmGyDXbTtjP?usp=drive_link" target="_blank">📁 Pasta Relatórios Drive</a>
+            <div class="brand-title-row">
+                <h1>GESTÃO DE BAIRROS CRÍTICOS</h1>
+                <span class="live-badge">Google Sheets Live • SPI</span>
+            </div>
+            <div class="brand-subtitle">Contrato Vivo / TEL • Disponibilidade Móvel (3M), Histórico OS Prisma e Validação TAs Online</div>
         </div>
     </div>
 
-    <div id="loadingIndicator" class="loading-bar">⚡ Carregando base otimizada...</div>
+    <div class="header-right">
+        <div class="sync-info">
+            <span>ÚLTIMA SINCRONIZAÇÃO</span>
+            <strong id="clockSync">--:--:--</strong>
+        </div>
+        <button class="btn-top btn-sync" onclick="init()">🔄 Sincronizar</button>
+        <button class="btn-top btn-dark-action" onclick="abrirModalPDF()">📄 Inserir PDF</button>
+        <a class="btn-top btn-dark-action" href="https://drive.google.com/drive/folders/1DrTg27KPrC61tWzg6d9wDcmGyDXbTtjP?usp=drive_link" target="_blank">📁 Pasta Drive</a>
+        <button class="btn-top btn-blue-action" onclick="exportarExcelAtual()">📥 Exportar Base (.xlsx)</button>
+    </div>
+</header>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="trocarAba('abaBairros', this)">📍 Análise de Bairros / Sites</button>
-        <button class="tab-btn" onclick="trocarAba('abaOS', this)">🛠️ Análise Geral de OS (OS Prisma)</button>
-        <button class="tab-btn" onclick="trocarAba('abaTAs', this)">🚨 TAs Ativas em Bairros Críticos</button>
+<div class="main-wrapper">
+
+    <!-- BANNER DE REGRAS -->
+    <div class="rules-banner">
+        <div class="rules-text">
+            <span class="dot-red"></span>
+            <span><strong>Regras de Criticidade:</strong> Crítico &lt; 96,00% | Alerta 96,01% a 97,99% | Não Crítico &ge; 98,00% (Últimos 3 meses) • Vínculo OS Prisma: <code>M.SP.(Sigla)</code></span>
+        </div>
+        <div class="period-pill" id="infoMesesBase">📅 Período Analisado: Carregando...</div>
     </div>
 
-    <!-- ABA 1: BAIRROS -->
+    <div id="loadingIndicator" class="alert-config">⚡ Conectando ao servidor Google Apps Script...</div>
+
+    <!-- KPI CARDS PADRONIZADOS -->
+    <div class="kpi-grid">
+        <div class="kpi-card top-blue">
+            <div class="kpi-header"><span>TOTAL DE SITES</span><span class="kpi-icon">📶</span></div>
+            <div class="kpi-value val-dark" id="countTotal">0</div>
+            <div class="kpi-footer"><span>Base Rede Móvel</span><span>100%</span></div>
+        </div>
+        <div class="kpi-card top-red">
+            <div class="kpi-header"><span>BAIRROS CRÍTICOS</span><span class="kpi-icon">🚫</span></div>
+            <div class="kpi-value val-red" id="countCritico">0</div>
+            <div class="kpi-footer"><span>Abaixo de 96,0%</span><span id="percCritico">0%</span></div>
+        </div>
+        <div class="kpi-card top-amber">
+            <div class="kpi-header"><span>EM ALERTA</span><span class="kpi-icon">⏳</span></div>
+            <div class="kpi-value val-amber" id="countAlerta">0</div>
+            <div class="kpi-footer"><span>96,01% a 97,99%</span><span id="percAlerta">0%</span></div>
+        </div>
+        <div class="kpi-card top-purple">
+            <div class="kpi-header"><span>SITES C/ TA ONLINE</span><span class="kpi-icon">🚨</span></div>
+            <div class="kpi-value val-purple" id="countComTA">0</div>
+            <div class="kpi-footer"><span>TAs não encerradas</span><span id="totalTAsBadge">0 TAs</span></div>
+        </div>
+        <div class="kpi-card top-green">
+            <div class="kpi-header"><span>OS PRISMA VINCULADAS</span><span class="kpi-icon">🛠️</span></div>
+            <div class="kpi-value val-green" id="countOSVinculadas">0</div>
+            <div class="kpi-footer"><span>Histórico Crítico/Alerta</span><span id="osAbertasResumo">0 abertas</span></div>
+        </div>
+        <div class="kpi-card top-cyan">
+            <div class="kpi-header"><span>DISPONIBILIDADE OK</span><span class="kpi-icon">📈</span></div>
+            <div class="kpi-value val-cyan" id="percNaoCritico">0%</div>
+            <div class="kpi-footer"><span>Sites &ge; 98,0%</span><span id="countNaoCritico">0 sites</span></div>
+        </div>
+    </div>
+
+    <!-- ABAS DE NAVEGAÇÃO -->
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="trocarAba('abaBairros', this)">📍 ANÁLISE DE BAIRROS / SITES</button>
+        <button class="tab-btn" onclick="trocarAba('abaOS', this)">🛠️ ANÁLISE GERAL DE OS (OS PRISMA)</button>
+        <button class="tab-btn" onclick="trocarAba('abaTAs', this)">🚨 TAs ATIVAS EM BAIRROS CRÍTICOS</button>
+    </div>
+
+    <!-- =====================================================================
+         ABA 1: ANÁLISE DE BAIRROS / SITES
+    ====================================================================== -->
     <div id="abaBairros" class="tab-content active">
-        <div class="filters">
-            <div class="filter-group"><label>DDD</label><select id="fDDD" onchange="filtrarBairros()"><option value="">Todos</option></select></div>
-            <div class="filter-group"><label>Cidade</label><select id="fCidade" onchange="filtrarBairros()"><option value="">Todas</option></select></div>
-            <div class="filter-group"><label>Bairro / Site</label><input type="text" id="fSite" placeholder="Ex: M.SP.ABC ou Bairro..." oninput="debounceFiltroBairros()"></div>
-            <div class="filter-group">
-                <label>TA Online Ativo?</label>
-                <select id="fTA" onchange="filtrarBairros()">
-                    <option value="">Todos</option>
-                    <option value="SIM">SIM (Com TA Aberta)</option>
-                    <option value="NAO">NÃO</option>
-                </select>
+        <div class="filter-panel">
+            <div class="filter-panel-header">
+                <div class="filter-panel-title">🔽 FILTROS DE PESQUISA (BAIRROS & SITES)</div>
+                <button class="btn-reset-link" onclick="limparFiltros()">↻ Limpar Filtros</button>
             </div>
-            <div class="filter-group">
-                <label>Criticidade (3 Meses)</label>
-                <select id="fCrit" onchange="filtrarBairros()">
-                    <option value="">Todas</option>
-                    <option value="CRÍTICO">CRÍTICO (&lt; 96,0%)</option>
-                    <option value="ALERTA">ALERTA (96,01% - 97,99%)</option>
-                    <option value="NÃO CRÍTICO">NÃO CRÍTICO (&ge; 98,0%)</option>
-                </select>
-            </div>
-            <div class="filter-group" style="flex:0; min-width:auto; flex-direction:row; gap:8px;">
-                <button class="btn btn-clear" onclick="limparFiltros()">Limpar</button>
-                <button class="btn btn-excel" onclick="exportarExcelBairros()">📥 Excel</button>
+            <div class="filter-grid">
+                <div class="filter-item"><label>DDD</label><select id="fDDD" onchange="filtrarBairros()"><option value="">Todos</option></select></div>
+                <div class="filter-item"><label>CIDADE / MUNICÍPIO</label><select id="fCidade" onchange="filtrarBairros()"><option value="">Todas</option></select></div>
+                <div class="filter-item">
+                    <label>CRITICIDADE (3 MESES)</label>
+                    <select id="fCrit" onchange="filtrarBairros()">
+                        <option value="">Todas</option>
+                        <option value="CRÍTICO">CRÍTICO (&lt; 96,0%)</option>
+                        <option value="ALERTA">ALERTA (96,01% - 97,99%)</option>
+                        <option value="NÃO CRÍTICO">NÃO CRÍTICO (&ge; 98,0%)</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>TA ONLINE ATIVA?</label>
+                    <select id="fTA" onchange="filtrarBairros()">
+                        <option value="">Todos</option>
+                        <option value="SIM">SIM (Com TA Aberta)</option>
+                        <option value="NAO">NÃO</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>BUSCA LIVRE (SITE / BAIRRO)</label>
+                    <input type="text" id="fSite" placeholder="🔍 Ex: M.SP.ABC, Bairro..." oninput="debounceFiltroBairros()">
+                </div>
             </div>
         </div>
 
-        <div class="summary">
-            <div class="card card-total"><span class="label-top">Total de Sites</span><span id="countTotal" class="valor">0</span></div>
-            <div class="card card-critico"><span class="label-top">Críticos (&lt; 96%)</span><span id="countCritico" class="valor">0</span></div>
-            <div class="card card-alerta"><span class="label-top">Em Alerta</span><span id="countAlerta" class="valor">0</span></div>
-            <div class="card card-ta"><span class="label-top">Sites c/ TA Ativa</span><span id="countComTA" class="valor">0</span></div>
-            <div class="card card-os"><span class="label-top">OS Prisma Vinculadas</span><span id="countOSVinculadas" class="valor">0</span></div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3>📋 CONSOLIDADO DE DISPONIBILIDADE POR BAIRRO / SITE</h3>
+                <span class="pill-info">Critério: 3 últimos meses dinâmicos</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr id="theadBairros">
+                            <th>DDD</th><th>Cidade</th><th>Bairro</th><th>Site</th>
+                            <th>Mês -2</th><th>Mês -1</th><th>Mês Atual</th>
+                            <th>Status (3M)</th><th>TA Online</th><th>OS Prisma</th><th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBairrosBody"></tbody>
+                </table>
+            </div>
+            <button id="btnMaisBairros" class="btn-more" style="display:none;" onclick="mostrarMaisBairros()">⬇️ Carregar mais registros</button>
         </div>
-
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr id="theadBairros">
-                        <th>DDD</th><th>Cidade</th><th>Bairro</th><th>Site</th>
-                        <th>Mês -2</th><th>Mês -1</th><th>Mês Atual</th>
-                        <th>Status</th><th>TA Ativo</th><th>Qtd OS</th><th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaBairrosBody"></tbody>
-            </table>
-        </div>
-        <button id="btnMaisBairros" class="btn btn-more" style="display:none;" onclick="mostrarMaisBairros()">⬇️ Carregar mais registros</button>
     </div>
 
-    <!-- ABA 2: ANÁLISE GERAL OS -->
+    <!-- =====================================================================
+         ABA 2: ANÁLISE GERAL DE OS (OS PRISMA)
+    ====================================================================== -->
     <div id="abaOS" class="tab-content">
-        <div class="filters">
-            <div class="filter-group"><label>Filtrar Site / Sigla</label><input type="text" id="fOSSite" placeholder="Ex: M.SP.ABC..." oninput="debounceFiltroOS()"></div>
-            <div class="filter-group">
-                <label>Criticidade do Bairro</label>
-                <select id="fOSCrit" onchange="filtrarOS()">
-                    <option value="">Todos (Críticos e Alerta)</option>
-                    <option value="CRÍTICO">Somente CRÍTICOS</option>
-                    <option value="ALERTA">Somente ALERTA</option>
-                </select>
+        <div class="filter-panel">
+            <div class="filter-panel-header">
+                <div class="filter-panel-title">🔽 FILTROS DE ORDENS DE SERVIÇO (OS PRISMA)</div>
+                <button class="btn-reset-link" onclick="limparFiltrosOS()">↻ Limpar Filtros</button>
             </div>
-            <div class="filter-group">
-                <label>Status da OS</label>
-                <select id="fOSStatus" onchange="filtrarOS()">
-                    <option value="">Todos</option>
-                    <option value="ABERTA">Em Aberto / Execução</option>
-                    <option value="ENCERRADA">Encerrada / Concluída</option>
-                </select>
-            </div>
-            <div class="filter-group" style="flex:0; min-width:auto;">
-                <button class="btn btn-excel" onclick="exportarExcelOS()">📥 Exportar OS Prisma</button>
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <label>CRITICIDADE DO BAIRRO</label>
+                    <select id="fOSCrit" onchange="filtrarOS()">
+                        <option value="">Todos (Críticos e Alerta)</option>
+                        <option value="CRÍTICO">Somente CRÍTICOS</option>
+                        <option value="ALERTA">Somente ALERTA</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>STATUS DA OS</label>
+                    <select id="fOSStatus" onchange="filtrarOS()">
+                        <option value="">Todos</option>
+                        <option value="ABERTA">Em Aberto / Execução</option>
+                        <option value="ENCERRADA">Encerrada / Concluída</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>BUSCA POR SITE / SIGLA / BAIRRO</label>
+                    <input type="text" id="fOSSite" placeholder="🔍 Ex: M.SP.ABC..." oninput="debounceFiltroOS()">
+                </div>
             </div>
         </div>
 
-        <div class="summary">
-            <div class="card card-os"><span class="label-top">Total OS (Críticos/Alerta)</span><span id="osTotalCard" class="valor">0</span></div>
-            <div class="card card-critico"><span class="label-top">OS em Aberto</span><span id="osAbertasCard" class="valor">0</span></div>
-            <div class="card card-total"><span class="label-top">OS Encerradas</span><span id="osEncerradasCard" class="valor">0</span></div>
-            <div class="card card-alerta"><span class="label-top">Sites Afetados</span><span id="osSitesCard" class="valor">0</span></div>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3>📊 RANKING DE REINCIDÊNCIA DE OS POR SITE CRÍTICO</h3>
+                <span class="pill-info" id="resumoRankingBadge">0 sites afetados</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>Sigla</th><th>Site</th><th>Cidade</th><th>Bairro</th><th>Status</th><th>Total OS</th><th>OS Abertas</th><th>OS Encerradas</th></tr>
+                    </thead>
+                    <tbody id="tabelaRankingOSBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <h3 style="margin-top:10px; color:#2c3e50; font-size:16px;">📊 Ranking de Reincidência de OS por Site Crítico</h3>
-        <div class="table-wrapper" style="margin-bottom:20px;">
-            <table>
-                <thead><tr><th>Sigla</th><th>Site</th><th>Cidade</th><th>Bairro</th><th>Status</th><th>Total OS</th><th>Abertas</th><th>Encerradas</th></tr></thead>
-                <tbody id="tabelaRankingOSBody"></tbody>
-            </table>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3>🛠️ HISTÓRICO DETALHADO DAS ORDENS DE SERVIÇO (OS PRISMA)</h3>
+                <span class="pill-info" id="resumoTotalOSBadge">0 registros</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead id="theadOSPrisma"></thead>
+                    <tbody id="tabelaOSPrismaBody"></tbody>
+                </table>
+            </div>
+            <button id="btnMaisOS" class="btn-more" style="display:none;" onclick="mostrarMaisOS()">⬇️ Carregar mais OS</button>
         </div>
-
-        <h3 style="color:#2c3e50; font-size:16px;">📋 Detalhamento das Ordens de Serviço (OS Prisma)</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead id="theadOSPrisma"></thead>
-                <tbody id="tabelaOSPrismaBody"></tbody>
-            </table>
-        </div>
-        <button id="btnMaisOS" class="btn btn-more" style="display:none;" onclick="mostrarMaisOS()">⬇️ Carregar mais OS</button>
     </div>
 
-    <!-- ABA 3: TAs ONLINE -->
+    <!-- =====================================================================
+         ABA 3: TAs ATIVAS EM BAIRROS CRÍTICOS
+    ====================================================================== -->
     <div id="abaTAs" class="tab-content">
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr><th>DDD</th><th>Cidade</th><th>Bairro</th><th>Site</th><th>Status Bairro</th><th>Número TA</th><th>Status TA</th><th>Data / Abertura</th><th>Causa / Alarme</th></tr>
-                </thead>
-                <tbody id="tabelaTAsBody"></tbody>
-            </table>
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3>🚨 VALIDAÇÃO DE TAs ONLINE ATIVAS (NÃO ENCERRADAS) EM BAIRROS CRÍTICOS</h3>
+                <span class="pill-info">Cruzamento automático em tempo real</span>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>DDD</th><th>Cidade</th><th>Bairro</th><th>Site</th><th>Status Bairro</th><th>Número TA</th><th>Status TA</th><th>Data / Abertura</th><th>Causa / Alarme</th></tr>
+                    </thead>
+                    <tbody id="tabelaTAsBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
 </div>
 
 <!-- MODAL PDF -->
 <div id="modalPDF" class="modal">
     <div class="modal-content" style="max-width: 500px;">
         <span class="close-btn" onclick="fecharModais()">&times;</span>
-        <h3>📄 Anexar Relatório PDF no Google Drive</h3>
+        <h3 style="margin-top:0;">📄 Anexar Relatório PDF no Google Drive</h3>
         <div style="display:flex; flex-direction:column; gap:12px; margin-top:15px;">
-            <div>
+            <div class="filter-item">
                 <label>Vincular ao Site / Bairro (Opcional)</label>
-                <select id="pdfSiteSelect" style="width:100%;"><option value="">Geral / Sem site específico</option></select>
+                <select id="pdfSiteSelect"><option value="">Geral / Sem site específico</option></select>
             </div>
-            <div>
+            <div class="filter-item">
                 <label>Selecione o arquivo PDF</label>
-                <input type="file" id="pdfFileInput" accept="application/pdf" style="width:95%;">
+                <input type="file" id="pdfFileInput" accept="application/pdf">
             </div>
-            <button class="btn btn-pdf" style="justify-content:center; margin-top:8px;" onclick="enviarPDFParaDrive()">⬆️ Enviar PDF para o Drive</button>
-            <div id="statusUploadPDF" style="font-size:13px; font-weight:bold; margin-top:5px;"></div>
+            <button class="btn-top btn-blue-action" style="justify-content:center; margin-top:6px;" onclick="enviarPDFParaDrive()">⬆️ Enviar PDF para o Drive</button>
+            <div id="statusUploadPDF" style="font-size:13px; font-weight:600; margin-top:5px;"></div>
         </div>
     </div>
 </div>
@@ -235,9 +751,9 @@
 <div id="modalCarimbo" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="fecharModais()">&times;</span>
-        <h3>📋 Gerador de Carimbo - Bairro Crítico</h3>
+        <h3 style="margin-top:0;">📋 Gerador de Carimbo - Bairro Crítico</h3>
         <div id="carimboContent" class="carimbo-box"></div>
-        <button class="btn btn-drive" style="margin-top:15px;" onclick="copiarCarimbo()">Copiar Texto</button>
+        <button class="btn-top btn-blue-action" style="margin-top:15px;" onclick="copiarCarimbo()">📋 Copiar Carimbo</button>
     </div>
 </div>
 
@@ -245,11 +761,13 @@
 <div id="modalHistorico" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="fecharModais()">&times;</span>
-        <h3 id="modalTitulo">Histórico do Site</h3>
-        <h4>🚨 TAs Online Ativas</h4>
+        <h3 id="modalTitulo" style="margin-top:0;">Histórico do Site</h3>
+        <h4 style="margin-bottom:8px; color:#6d28d9;">🚨 TAs Online Ativas</h4>
         <table><thead><tr><th>TA</th><th>Status</th><th>Data</th><th>Causa</th></tr></thead><tbody id="histTAsBody"></tbody></table>
-        <h4 style="margin-top:20px;">🛠️ Histórico de Ordens de Serviço (OS Prisma)</h4>
-        <table><thead id="histOSHead"></thead><tbody id="histOSBody"></tbody></table>
+        <h4 style="margin:20px 0 8px 0; color:#1e293b;">🛠️ Histórico de Ordens de Serviço (OS Prisma)</h4>
+        <div class="table-wrapper">
+            <table><thead id="histOSHead"></thead><tbody id="histOSBody"></tbody></table>
+        </div>
     </div>
 </div>
 
@@ -262,15 +780,21 @@
     let dadosPortal = { meses: [], sites: [], headersOS: [], osList: [], tasAtivas: [] };
     let sitesFiltrados = [];
     let osFiltradas = [];
+    let abaAtivaAtual = "abaBairros";
     let limiteBairros = 100;
     let limiteOS = 100;
     let timerBairros, timerOS;
 
     async function init() {
+        const loader = document.getElementById('loadingIndicator');
+        loader.style.display = 'block';
+
         if (WEB_APP_URL.includes("COLE_AQUI")) {
-            document.getElementById('loadingIndicator').innerText = "⚠️ Configure a constante WEB_APP_URL no código HTML com a URL do seu Apps Script.";
+            loader.innerText = "⚠️ Configure a constante WEB_APP_URL no código HTML com a URL do seu Apps Script.";
             return;
         }
+
+        loader.innerText = "⚡ Sincronizando dados com Google Sheets...";
 
         try {
             const resp = await fetch(WEB_APP_URL);
@@ -286,10 +810,11 @@
             filtrarOS();
             renderizarTAs();
 
-            document.getElementById('loadingIndicator').style.display = 'none';
-            document.getElementById('infoMesesBase').innerText = `Meses: ${dadosPortal.meses.join(" | ")} • Atualizado em: ${dadosPortal.atualizadoEm || "Agora"}`;
+            loader.style.display = 'none';
+            document.getElementById('infoMesesBase').innerText = `📅 Meses Analisados: ${dadosPortal.meses.join(" • ")}`;
+            document.getElementById('clockSync').innerText = new Date().toLocaleTimeString('pt-BR');
         } catch (e) {
-            document.getElementById('loadingIndicator').innerText = "❌ Erro ao carregar dados do Apps Script. Verifique se a implantação está como 'Qualquer pessoa'.";
+            loader.innerText = "❌ Erro ao carregar dados do Apps Script. Verifique a URL e permissões da implantação.";
             console.error(e);
         }
     }
@@ -299,10 +824,13 @@
         const cidades = [...new Set(dadosPortal.sites.map(s => s.c))].filter(Boolean).sort();
         const selDDD = document.getElementById('fDDD');
         const selCid = document.getElementById('fCidade');
+        selDDD.innerHTML = '<option value="">Todos</option>';
+        selCid.innerHTML = '<option value="">Todas</option>';
         ddds.forEach(d => selDDD.add(new Option(d, d)));
         cidades.forEach(c => selCid.add(new Option(c, c)));
 
         const pdfSel = document.getElementById('pdfSiteSelect');
+        pdfSel.innerHTML = '<option value="">Geral / Sem site específico</option>';
         dadosPortal.sites.filter(s => s.st !== "NÃO CRÍTICO").forEach(s => {
             pdfSel.add(new Option(`${s.s} - ${s.b} (${s.c})`, s.s));
         });
@@ -326,7 +854,7 @@
         const taF = document.getElementById('fTA').value;
         const critF = document.getElementById('fCrit').value;
 
-        let cCrit = 0, cAlert = 0, cTA = 0, cOS = 0;
+        let cCrit = 0, cAlert = 0, cNaoCrit = 0, cTA = 0, totalTAs = 0, cOS = 0;
 
         sitesFiltrados = dadosPortal.sites.filter(s => {
             const mDDD = !ddd || s.d == ddd;
@@ -337,27 +865,49 @@
 
             if (mDDD && mCid && mBusca && mTA && mCrit) {
                 if (s.st === "CRÍTICO") cCrit++;
-                if (s.st === "ALERTA") cAlert++;
-                if (s.tas.length > 0) cTA++;
+                else if (s.st === "ALERTA") cAlert++;
+                else cNaoCrit++;
+
+                if (s.tas.length > 0) {
+                    cTA++;
+                    totalTAs += s.tas.length;
+                }
                 cOS += s.qtdOS;
                 return true;
             }
             return false;
         });
 
-        document.getElementById('countTotal').innerText = sitesFiltrados.length;
-        document.getElementById('countCritico').innerText = cCrit;
-        document.getElementById('countAlerta').innerText = cAlert;
-        document.getElementById('countComTA').innerText = cTA;
-        document.getElementById('countOSVinculadas').innerText = cOS;
+        const tot = sitesFiltrados.length || 1;
+        document.getElementById('countTotal').innerText = sitesFiltrados.length.toLocaleString('pt-BR');
+        document.getElementById('countCritico').innerText = cCrit.toLocaleString('pt-BR');
+        document.getElementById('percCritico').innerText = ((cCrit / tot) * 100).toFixed(1) + "%";
+        
+        document.getElementById('countAlerta').innerText = cAlert.toLocaleString('pt-BR');
+        document.getElementById('percAlerta').innerText = ((cAlert / tot) * 100).toFixed(1) + "%";
+
+        document.getElementById('countComTA').innerText = cTA.toLocaleString('pt-BR');
+        document.getElementById('totalTAsBadge').innerText = `${totalTAs} TAs`;
+
+        document.getElementById('countOSVinculadas').innerText = cOS.toLocaleString('pt-BR');
+        document.getElementById('countNaoCritico').innerText = `${cNaoCrit} sites`;
+        document.getElementById('percNaoCritico').innerText = ((cNaoCrit / tot) * 100).toFixed(1) + "%";
 
         renderizarTabelaBairros();
+    }
+
+    function formatarCelulaHeat(v) {
+        if (v === null || v === undefined) return "-";
+        const num = Number(v);
+        const txt = num.toFixed(2).replace('.', ',') + "%";
+        if (num > 0 && num < 96.0) return `<span class="cell-heat-crit">${txt}</span>`;
+        if (num >= 96.01 && num <= 97.99) return `<span class="cell-heat-alert">${txt}</span>`;
+        return `<span class="cell-heat-ok">${txt}</span>`;
     }
 
     function renderizarTabelaBairros() {
         const tbody = document.getElementById('tabelaBairrosBody');
         const fatia = sitesFiltrados.slice(0, limiteBairros);
-        const fmtVal = v => v !== null && v !== undefined ? Number(v).toFixed(2).replace('.', ',') + "%" : "-";
 
         tbody.innerHTML = fatia.map(s => {
             const bClass = s.st === "CRÍTICO" ? "bg-vermelho" : (s.st === "ALERTA" ? "bg-amarelo" : "bg-verde");
@@ -367,16 +917,16 @@
                 <td>${s.c || "-"}</td>
                 <td>${s.b || "-"}</td>
                 <td><strong>${s.s}</strong></td>
-                <td>${fmtVal(s.v[0])}</td>
-                <td>${fmtVal(s.v[1])}</td>
-                <td><strong>${fmtVal(s.v[2])}</strong></td>
+                <td>${formatarCelulaHeat(s.v[0])}</td>
+                <td>${formatarCelulaHeat(s.v[1])}</td>
+                <td>${formatarCelulaHeat(s.v[2])}</td>
                 <td><span class="status-badge ${bClass}">${s.st}</span></td>
                 <td>${taTxt}</td>
                 <td><strong>${s.qtdOS}</strong></td>
                 <td>
                     <div class="action-btns">
-                        <button class="btn-hist" onclick="abrirHistorico('${s.g}')">Histórico</button>
-                        <button class="btn-carimbo" onclick="gerarCarimbo('${s.g}')">Carimbo</button>
+                        <button class="btn-row btn-hist" onclick="abrirHistorico('${s.g}')">Histórico</button>
+                        <button class="btn-row btn-carimbo" onclick="gerarCarimbo('${s.g}')">Carimbo</button>
                     </div>
                 </td>
             </tr>`;
@@ -384,8 +934,8 @@
 
         const btnMais = document.getElementById('btnMaisBairros');
         if (sitesFiltrados.length > limiteBairros) {
-            btnMais.style.display = "flex";
-            btnMais.innerText = `⬇️ Carregar mais (exibindo ${fatia.length} de ${sitesFiltrados.length})`;
+            btnMais.style.display = "block";
+            btnMais.innerText = `⬇️ Carregar mais registros (exibindo ${fatia.length} de ${sitesFiltrados.length})`;
         } else {
             btnMais.style.display = "none";
         }
@@ -425,10 +975,9 @@
             return false;
         });
 
-        document.getElementById('osTotalCard').innerText = osFiltradas.length;
-        document.getElementById('osAbertasCard').innerText = abertas;
-        document.getElementById('osEncerradasCard').innerText = encerradas;
-        document.getElementById('osSitesCard').innerText = sitesUnicos.size;
+        document.getElementById('osAbertasResumo').innerText = `${abertas} abertas`;
+        document.getElementById('resumoRankingBadge').innerText = `${sitesUnicos.size} sites afetados`;
+        document.getElementById('resumoTotalOSBadge').innerText = `${osFiltradas.length} ordens de serviço`;
 
         document.getElementById('tabelaRankingOSBody').innerHTML = Object.values(rankMap)
             .sort((a, b) => b.total - a.total)
@@ -439,8 +988,8 @@
                     <td><strong>${r.g}</strong></td><td>${r.s}</td><td>${r.c}</td><td>${r.b}</td>
                     <td><span class="status-badge ${bClass}">${r.st}</span></td>
                     <td><strong>${r.total}</strong></td>
-                    <td style="color:#d93025;font-weight:bold;">${r.ab}</td>
-                    <td style="color:#1e8e3e;">${r.enc}</td>
+                    <td style="color:#ef4444;font-weight:700;">${r.ab}</td>
+                    <td style="color:#10b981;font-weight:600;">${r.enc}</td>
                 </tr>`;
             }).join("");
 
@@ -463,7 +1012,7 @@
 
         const btnMais = document.getElementById('btnMaisOS');
         if (osFiltradas.length > limiteOS) {
-            btnMais.style.display = "flex";
+            btnMais.style.display = "block";
             btnMais.innerText = `⬇️ Carregar mais OS (exibindo ${fatia.length} de ${osFiltradas.length})`;
         } else {
             btnMais.style.display = "none";
@@ -543,7 +1092,7 @@ Deslocamento / Previsão: `;
 
         if (!fileInput.files.length) return alert("Selecione um arquivo PDF.");
         const file = fileInput.files[0];
-        statusDiv.style.color = "#1a73e8";
+        statusDiv.style.color = "#2563eb";
         statusDiv.innerText = "⏳ Enviando PDF para o Google Drive...";
 
         const reader = new FileReader();
@@ -556,45 +1105,46 @@ Deslocamento / Previsão: `;
                 });
                 const resJson = await resp.json();
                 if (resJson.status === "success") {
-                    statusDiv.style.color = "#1e8e3e";
+                    statusDiv.style.color = "#10b981";
                     statusDiv.innerHTML = `✅ Salvo no Drive: <a href="${resJson.fileUrl}" target="_blank">${resJson.fileName}</a>`;
                     fileInput.value = "";
                 } else throw new Error(resJson.message);
             } catch (err) {
-                statusDiv.style.color = "#d93025";
+                statusDiv.style.color = "#ef4444";
                 statusDiv.innerText = "❌ Erro: " + err.message;
             }
         };
         reader.readAsDataURL(file);
     }
 
-    function exportarExcelBairros() {
-        const rows = sitesFiltrados.map(s => ({
-            "DDD": s.d, "Cidade": s.c, "Bairro": s.b, "Site": s.s, "Sigla": s.g,
-            [dadosPortal.meses[0] || "Mês -2"]: s.v[0] ?? "-",
-            [dadosPortal.meses[1] || "Mês -1"]: s.v[1] ?? "-",
-            [dadosPortal.meses[2] || "Mês Atual"]: s.v[2] ?? "-",
-            "Status": s.st, "TAs Ativas": s.tas.map(t => t.ta).join(", ") || "NÃO", "Total OS": s.qtdOS
-        }));
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Analise_Bairros");
-        XLSX.writeFile(wb, "Analise_Bairros_Criticos.xlsx");
-    }
-
-    function exportarExcelOS() {
-        const rows = osFiltradas.map(o => {
-            let obj = { "Bairro Crítico": o.b, "Sigla": o.g, "Status Site": o.st };
-            dadosPortal.headersOS.forEach((h, i) => obj[h] = o.r[i]);
-            return obj;
-        });
-        const ws = XLSX.utils.json_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "OS_Prisma");
-        XLSX.writeFile(wb, "Analise_Geral_OS_Prisma.xlsx");
+    function exportarExcelAtual() {
+        if (abaAtivaAtual === "abaOS") {
+            const rows = osFiltradas.map(o => {
+                let obj = { "Bairro Crítico": o.b, "Sigla": o.g, "Status Site": o.st };
+                dadosPortal.headersOS.forEach((h, i) => obj[h] = o.r[i]);
+                return obj;
+            });
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "OS_Prisma");
+            XLSX.writeFile(wb, "Analise_Geral_OS_Prisma.xlsx");
+        } else {
+            const rows = sitesFiltrados.map(s => ({
+                "DDD": s.d, "Cidade": s.c, "Bairro": s.b, "Site": s.s, "Sigla": s.g,
+                [dadosPortal.meses[0] || "Mês -2"]: s.v[0] ?? "-",
+                [dadosPortal.meses[1] || "Mês -1"]: s.v[1] ?? "-",
+                [dadosPortal.meses[2] || "Mês Atual"]: s.v[2] ?? "-",
+                "Status": s.st, "TAs Ativas": s.tas.map(t => t.ta).join(", ") || "NÃO", "Total OS": s.qtdOS
+            }));
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Analise_Bairros");
+            XLSX.writeFile(wb, "Analise_Bairros_Criticos.xlsx");
+        }
     }
 
     function trocarAba(id, btn) {
+        abaAtivaAtual = id;
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -613,6 +1163,11 @@ Deslocamento / Previsão: `;
     function limparFiltros() {
         document.querySelectorAll('#abaBairros select, #abaBairros input').forEach(el => el.value = "");
         filtrarBairros();
+    }
+
+    function limparFiltrosOS() {
+        document.querySelectorAll('#abaOS select, #abaOS input').forEach(el => el.value = "");
+        filtrarOS();
     }
 
     window.onload = init;
